@@ -1,1 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-text="page_title">Hostel Name – Home</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <div class="logo" data-text="logo_text">Hostel Name</div>
+    <nav>
+      <a href="index.html" data-text="nav_home">Home</a>
+      <a href="rooms.html" data-text="nav_rooms">Rooms</a>
+      <a href="booking.html" data-text="nav_booking">Booking</a>
+      <a href="admin.html" data-text="nav_admin">Admin</a>
+      <a href="contact.html" data-text="nav_contact">Contact Us</a>
+    </nav>
+    <div class="lang-switch">
+      <span data-lang="en" class="active">EN</span>
+      <span data-lang="ru">RU</span>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <h1 data-text="hero_title">Welcome to Hostel Name</h1>
+    <p data-text="hero_sub">Your cozy, affordable stay in the heart of the city.</p>
+    <button onclick="window.location.href='booking.html'" data-text="hero_btn">Book a Bed</button>
+  </section>
+
+  <!-- ROOMS -->
+  <section>
+    <h2 data-text="rooms_title">Our Rooms</h2>
+    <p class="section-intro" data-text="rooms_intro">Choose from shared dorms and private rooms.</p>
+
+    <div class="rooms-grid">
+
+      <div class="room-card">
+        <img src="NAV03661.jpg" alt="8-Bed Mixed Dorm">
+        <div class="room-card-body">
+          <h3 data-text="room1_title">8-Bed Mixed Dorm</h3>
+          <p data-text="room1_desc">Comfortable bunk beds, lockers, shared bathroom.</p>
+          <button onclick="window.location.href='rooms.html'" data-text="view_details">View Details</button>
+        </div>
+      </div>
+
+      <div class="room-card">
+        <img src="10-dorms-room-athens-hawks.jpg" alt="10-Bed Mixed Dorm">
+        <div class="room-card-body">
+          <h3 data-text="room2_title">10-Bed Mixed Dorm</h3>
+          <p data-text="room2_desc">Mixed dorm with cozy atmosphere.</p>
+          <button onclick="window.location.href='rooms.html'" data-text="view_details">View Details</button>
+        </div>
+      </div>
+
+      <div class="room-card">
+        <img src="caption.jpg" alt="Single Bed Room">
+        <div class="room-card-body">
+          <h3 data-text="room3_title">Single Bed Room</h3>
+          <p data-text="room3_desc">Perfect for solo travelers.</p>
+          <button onclick="window.location.href='rooms.html'" data-text="view_details">View Details</button>
+        </div>
+      </div>
+
+      <div class="room-card">
+        <img src="The-Eden-Tampines-Pasir-Ris-Tampines-Singapore.jpg" alt="Private Room">
+        <div class="room-card-body">
+          <h3 data-text="room4_title">Private Room</h3>
+          <p data-text="room4_desc">Perfect for couples or solo travelers.</p>
+          <button onclick="window.location.href='rooms.html'" data-text="view_details">View Details</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- AMENITIES -->
+  <section class="amenities-section">
+    <h2 data-text="amenities_title">Amenities</h2>
+    <div class="amenities-container">
+      <img src="amenities.png" alt="Amenities" class="amenities-img">
+    </div>
+  </section>
+
+  <!-- LOCATION -->
+  <section class="location-section">
+    <h2 data-text="location_title">Location</h2>
+    <p class="section-intro" data-text="location_intro">We are centrally located.</p>
+
+    <div class="map-wrapper">
+      <iframe src="https://maps.google.com/maps?q=minsk&output=embed"></iframe>
+    </div>
+  </section>
+
+  <!-- ⭐ FULL STRUCTURED FOOTER WITH TRANSLATION -->
+  <footer class="footer-structured">
+    <div class="footer-content">
+
+      <!-- LEFT SIDE -->
+      <div class="footer-left">
+        <img src="footer-logo.png" alt="Hostel Logo" class="footer-logo">
+        <p class="footer-email">
+          <img src="email-icon.png" class="email-icon" alt="">
+          <span data-text="footer_email">info@hostelname.com</span>
+        </p>
+      </div>
+
+      <!-- RIGHT SIDE -->
+      <div class="footer-right">
+        <h3 data-text="footer_contact_heading">CONTACT NUMBERS</h3>
+
+        <p>
+          <strong data-text="footer_addr1">Storozhovskaya Street, 8</strong><br>
+          <span data-text="footer_phone1">+375 44 560-91-46</span>
+        </p>
+
+        <p>
+          <strong data-text="footer_addr2">46 Independence Avenue</strong><br>
+          <span data-text="footer_phone2">+375 29 322-60-91</span>
+        </p>
+
+        <p>
+          <strong data-text="footer_addr3">Berestynskaya 12, Building 1</strong><br>
+          <span data-text="footer_phone3">+375 44 533-33-15</span>
+        </p>
+      </div>
+
+    </div>
+
+    <div class="footer-bottom" data-text="footer_bottom">
+      © 2026 Hostel Name. All rights reserved.
+    </div>
+  </footer>
+
+  <!-- ⭐ TRANSLATION SCRIPT -->
+  <script>
+    const translations = {
+      en: {
+        page_title: "Hostel Name – Home",
+        logo_text: "Hostel Name",
+        nav_home: "Home",
+        nav_rooms: "Rooms",
+        nav_booking: "Booking",
+        nav_admin: "Admin",
+        nav_contact: "Contact Us",
+
+        hero_title: "Welcome to Hostel Name",
+        hero_sub: "Your cozy, affordable stay in the heart of the city.",
+        hero_btn: "Book a Bed",
+
+        rooms_title: "Our Rooms",
+        rooms_intro: "Choose from shared dorms and private rooms.",
+        room1_title: "8-Bed Mixed Dorm",
+        room1_desc: "Comfortable bunk beds, lockers, shared bathroom.",
+        room2_title: "10-Bed Mixed Dorm",
+        room2_desc: "Mixed dorm with cozy atmosphere.",
+        room3_title: "Single Bed Room",
+        room3_desc: "Perfect for solo travelers.",
+        room4_title: "Private Room",
+        room4_desc: "Perfect for couples or solo travelers.",
+        view_details: "View Details",
+
+        amenities_title: "Amenities",
+
+        location_title: "Location",
+        location_intro: "We are centrally located.",
+
+        footer_email: "info@hostelname.com",
+        footer_contact_heading: "CONTACT NUMBERS",
+
+        footer_addr1: "Storozhovskaya Street, 8",
+        footer_phone1: "+375 44 560-91-46",
+
+        footer_addr2: "46 Independence Avenue",
+        footer_phone2: "+375 29 322-60-91",
+
+        footer_addr3: "Berestynskaya 12, Building 1",
+        footer_phone3: "+375 44 533-33-15",
+
+        footer_bottom: "© 2026 Hostel Name. All rights reserved."
+      },
+
+      ru: {
+        page_title: "Hostel Name – Главная",
+        logo_text: "Hostel Name",
+        nav_home: "Главная",
+        nav_rooms: "Комнаты",
+        nav_booking: "Бронирование",
+        nav_admin: "Админ",
+        nav_contact: "Контакты",
+
+        hero_title: "Добро пожаловать в Hostel Name",
+        hero_sub: "Ваш уютный и доступный отдых в центре города.",
+        hero_btn: "Забронировать",
+
+        rooms_title: "Наши комнаты",
+        rooms_intro: "Выберите общие или частные номера.",
+        room1_title: "Общий номер на 8 человек",
+        room1_desc: "Удобные двухъярусные кровати, шкафчики, общий санузел.",
+        room2_title: "Общий номер на 10 человек",
+        room2_desc: "Уютная атмосфера и комфорт.",
+        room3_title: "Одноместная комната",
+        room3_desc: "Идеально для одиночных путешественников.",
+        room4_title: "Частная комната",
+        room4_desc: "Подходит для пар или одиночных гостей.",
+        view_details: "Подробнее",
+
+        amenities_title: "Удобства",
+
+        location_title: "Локация",
+        location_intro: "Мы находимся в центре города.",
+
+        footer_email: "info@hostelname.com",
+        footer_contact_heading: "КОНТАКТНЫЕ НОМЕРА",
+
+        footer_addr1: "Улица Сторожовская, 8",
+        footer_phone1: "+375 44 560-91-46",
+
+        footer_addr2: "Проспект Независимости, 46",
+        footer_phone2: "+375 29 322-60-91",
+
+        footer_addr3: "Берестынская 12, корпус 1",
+        footer_phone3: "+375 44 533-33-15",
+
+        footer_bottom: "© 2026 Hostel Name. Все права защищены."
+      }
+    };
+
+    function applyTranslation(lang) {
+      document.querySelectorAll("[data-text]").forEach(el => {
+        const key = el.getAttribute("data-text");
+        if (translations[lang] && translations[lang][key]) {
+          el.innerText = translations[lang][key];
+        }
+      });
+      if (translations[lang] && translations[lang].page_title) {
+        document.title = translations[lang].page_title;
+      }
+    }
+
+    document.querySelectorAll('.lang-switch span').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.lang-switch span').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        applyTranslation(btn.dataset.lang);
+      });
+    });
+  </script>
+
+</body>
+</html>
 
