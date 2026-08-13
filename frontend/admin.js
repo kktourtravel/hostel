@@ -1,9 +1,11 @@
+const API_BASE = "https://hostelbackend1.onrender.com";
+
 // Login
 document.getElementById("adminLoginBtn")?.addEventListener("click", async () => {
     const email = document.getElementById("adminEmail").value;
     const password = document.getElementById("adminPassword").value;
 
-    const res = await fetch("/api/admin/login", {
+    const res = await fetch(`${API_BASE}/api/admin/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password })
@@ -14,6 +16,7 @@ document.getElementById("adminLoginBtn")?.addEventListener("click", async () => 
     if (data.token) {
         localStorage.setItem("adminToken", data.token);
         document.getElementById("adminDashboard").style.display = "block";
+        loadBookings();
     } else {
         alert("Login failed.");
     }
@@ -28,9 +31,12 @@ async function loadBookings() {
     const room = document.getElementById("filterRoom").value;
     const status = document.getElementById("filterStatus").value;
 
-    const res = await fetch(`/api/admin/bookings?from=${from}&to=${to}&room=${room}&status=${status}`, {
-        headers: { "Authorization": `Bearer ${token}` }
-    });
+    const res = await fetch(
+        `${API_BASE}/api/admin/bookings?from=${from}&to=${to}&room=${room}&status=${status}`,
+        {
+            headers: { "Authorization": `Bearer ${token}` }
+        }
+    );
 
     const data = await res.json();
 
@@ -58,7 +64,7 @@ document.getElementById("applyFiltersBtn")?.addEventListener("click", loadBookin
 async function cancelBooking(id) {
     const token = localStorage.getItem("adminToken");
 
-    const res = await fetch("/api/admin/bookings/cancel", {
+    const res = await fetch(`${API_BASE}/api/admin/bookings/cancel`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -80,5 +86,5 @@ document.getElementById("exportExcelBtn")?.addEventListener("click", () => {
     const from = document.getElementById("filterFrom").value;
     const to = document.getElementById("filterTo").value;
 
-    window.location.href = `/api/admin/export/excel?from=${from}&to=${to}`;
+    window.location.href = `${API_BASE}/api/admin/export/excel?from=${from}&to=${to}`;
 });
