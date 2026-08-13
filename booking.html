@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hostel Booking</title>
+  <title>Hostel Name – Booking</title>
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -18,11 +18,17 @@
     <a href="admin.html">Admin</a>
     <a href="contact.html">Contact Us</a>
   </nav>
+
+  <div class="lang-switch">
+    <span data-lang="en" class="active">EN</span>
+    <span data-lang="ru">RU</span>
+  </div>
 </header>
 
-<section class="booking-section">
+<section>
 
-  <h2>Book Your Stay</h2>
+  <h2>Booking Form</h2>
+  <p class="section-intro">Fill in your details to reserve your stay.</p>
 
   <!-- Step 1: Select Dates -->
   <div class="booking-wrapper">
@@ -42,11 +48,11 @@
   </div>
 
   <!-- Step 2: Available Beds -->
-  <h3>Available Beds</h3>
-  <div id="bedsContainer"></div>
+  <h2 style="margin-top:40px;">Available Beds</h2>
+  <div id="bedsContainer" style="max-width:600px;margin:auto;"></div>
 
   <!-- Step 3: Guest Details -->
-  <h3>Guest Details</h3>
+  <h2 style="margin-top:40px;">Guest Details</h2>
 
   <div class="booking-wrapper">
 
@@ -73,18 +79,85 @@
   </div>
 
   <!-- Step 4: Summary -->
-  <h3>Booking Summary</h3>
+  <h2 style="margin-top:40px;">Booking Summary</h2>
 
-  <p id="summaryDates">Check-in: - | Check-out: -</p>
-  <p id="summaryGuest">Guest: -</p>
-  <p id="summaryBed">Selected Bed: -</p>
+  <div class="booking-wrapper booking-summary">
+    <p id="summaryDates">Check-in: - | Check-out: -</p>
+    <p id="summaryGuest">Guest: -</p>
+    <p id="summaryBed">Selected Bed: -</p>
+  </div>
 
   <!-- Step 5: Confirm Booking -->
-  <button id="confirmBookingBtn">Confirm Booking</button>
+  <div class="booking-wrapper" style="margin-top:30px;">
+    <button id="confirmBookingBtn">Confirm Booking</button>
+  </div>
 
 </section>
 
+<footer class="footer-structured">
+  <div class="footer-content">
+
+    <div class="footer-left">
+      <img src="footer-logo.png" alt="Hostel Logo" class="footer-logo">
+      <p class="footer-email">
+        <img src="email-icon.png" class="email-icon">
+        info@hostelname.com
+      </p>
+    </div>
+
+    <div class="footer-right">
+      <h3>CONTACT NUMBERS</h3>
+
+      <p>
+        <strong>Storozhovskaya Street, 8</strong><br>
+        +375 44 560-91-46
+      </p>
+
+      <p>
+        <strong>46 Independence Avenue</strong><br>
+        +375 29 322-60-91
+      </p>
+
+      <p>
+        <strong>Berestynskaya 12, Building 1</strong><br>
+        +375 44 533-33-15
+      </p>
+    </div>
+
+  </div>
+
+  <div class="footer-bottom">
+    © 2026 Hostel Name. All rights reserved.
+  </div>
+</footer>
+
 <script src="booking.js"></script>
+
+<script>
+const translations = {
+  en: {
+    booking_title: "Booking Form",
+    booking_intro: "Fill in your details to reserve your stay."
+  },
+  ru: {
+    booking_title: "Форма бронирования",
+    booking_intro: "Заполните данные, чтобы забронировать проживание."
+  }
+};
+
+function applyTranslation(lang) {
+  document.querySelector("h2").innerText = translations[lang].booking_title;
+  document.querySelector(".section-intro").innerText = translations[lang].booking_intro;
+}
+
+document.querySelectorAll('.lang-switch span').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.lang-switch span').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    applyTranslation(btn.dataset.lang);
+  });
+});
+</script>
 
 </body>
 </html>
