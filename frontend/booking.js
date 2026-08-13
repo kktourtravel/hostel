@@ -83,7 +83,7 @@ document.getElementById("confirmBookingBtn").addEventListener("click", async () 
         checkout_date: document.getElementById("checkout").value
     };
 
-    const res = await fetch("http://localhost:5000/api/book", {
+    const res = await fetch("https://hostelbackend1.onrender.com/api/book", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
