@@ -1,4 +1,3 @@
-<!-- room.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,6 +23,7 @@
   </style>
 </head>
 <body>
+
 <header>
   <div class="logo">Hostel Name</div>
   <nav>
@@ -142,6 +142,7 @@ function showRoom(roomId){
   document.getElementById("roomDesc").innerText = r.desc;
   document.getElementById("roomPrice").innerText = formatBYN(r.price);
   document.getElementById("roomImage").src = r.image;
+
   const ul = document.getElementById("amenitiesList");
   ul.innerHTML = "";
   r.amenities.forEach(a => {
@@ -154,11 +155,11 @@ function showRoom(roomId){
 async function checkAvailability(roomId, checkin, checkout){
   const note = document.getElementById("availabilityNote");
   note.innerText = "Checking availability...";
+
   try {
-    const res = await fetch(`${API_BASE}/api/room/availability?room=${roomId}&checkin=${checkin}&checkout=${checkout}`)
-;
+    const res = await fetch(`${API_BASE}/api/room/availability?room=${roomId}&checkin=${checkin}&checkout=${checkout}`);
     const data = await res.json();
-    // expected response: { available: true/false, message: "...", available_beds: [...] }
+
     if (data.available) {
       note.innerHTML = `<strong>Available</strong> — ${formatBYN(ROOM_DATA[roomId].price)} per night`;
       showSelectButton(roomId, checkin, checkout);
@@ -177,13 +178,13 @@ function showSelectButton(roomId, checkin, checkout){
   btn.innerText = "Select";
   btn.style.background = "var(--accent-gold)";
   btn.onclick = () => {
-    // redirect to booking page with params
     const url = new URL("booking.html", location.href);
     url.searchParams.set("room", roomId);
     url.searchParams.set("checkin", checkin);
     url.searchParams.set("checkout", checkout);
     location.href = url.toString();
   };
+
   document.getElementById("sendRequestBtn").style.display = "none";
 }
 
@@ -192,10 +193,11 @@ function showSoldOut(){
   btn.innerText = "Check Availability";
   btn.style.background = "var(--primary-teal)";
   btn.onclick = handleCheckClick;
-  document.getElementById("sendRequestBtn").style.display = "inline-block";
-  document.getElementById("sendRequestBtn").onclick = () => {
+
+  const reqBtn = document.getElementById("sendRequestBtn");
+  reqBtn.style.display = "inline-block";
+  reqBtn.onclick = () => {
     alert("Request sent to hostel. We will contact you if a spot opens.");
-    // optionally implement API call to send request
   };
 }
 
@@ -203,10 +205,17 @@ function handleCheckClick(){
   const roomId = qs("room") || "8bed";
   const checkin = document.getElementById("checkin").value;
   const checkout = document.getElementById("checkout").value;
+
   if (!checkin || !checkout) {
     alert("Please select both check-in and check-out dates.");
     return;
   }
+
+  if (checkout <= checkin) {
+    alert("Checkout date must be after check-in date.");
+    return;
+  }
+
   checkAvailability(roomId, checkin, checkout);
 }
 
@@ -217,5 +226,6 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("checkAvailabilityBtn").addEventListener("click", handleCheckClick);
 });
 </script>
+
 </body>
 </html>
