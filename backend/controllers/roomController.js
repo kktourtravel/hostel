@@ -1,18 +1,42 @@
-const db = require("../config/db");
+exports.checkAvailability = (req, res) => {
+    const db = require("../config/db");
 
-exports.getRooms = (req, res) => {
-    db.query("SELECT * FROM rooms", (err, rooms) => {
-        if (err) return res.json({ error: err });
+    const room = req.query.room;
+    const checkin = req.query.checkin;
+    const checkout = req.query.checkout;
 
-        rooms.forEach(room => room.beds = []);
+    if (!room || !checkin || !checkout) {
+        return res.json({
+            available: false,
+            message: "Missing parameters"
+        });
+    }
 
-        db.query("SELECT * FROM beds", (err, beds) => {
-            beds.forEach(b => {
-                const room = rooms.find(r => r.id === b.room_id);
-                if (room) room.beds.push(b);
+    const sql = `
+        SELECT * FROM bookings
+        WHERE room_code = ?
+        AND checkin_date < ?
+        AND checkout_date > ?
+    `;
+
+    db.query(sql, [room, checkout, checkin], (err, results) => {
+        if (err) {
+            return res.json({
+                available: false,
+                message: "Database error"
             });
+        }
 
-            res.json({ rooms });
+        if (results.length > 0) {
+            return res.json({
+                available: false,
+                message: "Room is sold out for selected dates"
+            });
+        }
+
+        return res.json({
+            available: true,
+            message: "Room available"
         });
     });
 };
