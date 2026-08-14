@@ -155,7 +155,8 @@ async function checkAvailability(roomId, checkin, checkout){
   const note = document.getElementById("availabilityNote");
   note.innerText = "Checking availability...";
   try {
-    const res = await fetch(`${API_BASE}/api/availability?room=${roomId}&checkin=${checkin}&checkout=${checkout}`);
+    const res = await fetch(`${API_BASE}/api/room/availability?room=${roomId}&checkin=${checkin}&checkout=${checkout}`)
+;
     const data = await res.json();
     // expected response: { available: true/false, message: "...", available_beds: [...] }
     if (data.available) {
