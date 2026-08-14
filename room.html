@@ -1,0 +1,220 @@
+<!-- room.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Room — Hostel Name</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .price-pill {
+      display:inline-block;
+      background:var(--accent-gold);
+      color:var(--primary-teal);
+      padding:10px 14px;
+      border-radius:10px;
+      font-weight:800;
+      font-size:16px;
+    }
+    .availability-note { margin-top:12px; color:#7A8B82; }
+    .calendar-row { display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-top:14px; }
+    .calendar-row input { padding:10px; border-radius:6px; border:1px solid #A3C4B8; background:var(--light-ivory); }
+    .actions { margin-top:18px; display:flex; gap:12px; }
+    .sold-out { background:#f5f5f5; color:#b33; padding:10px 14px; border-radius:8px; font-weight:700; }
+  </style>
+</head>
+<body>
+<header>
+  <div class="logo">Hostel Name</div>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="rooms.html">Rooms</a>
+    <a href="booking.html">Booking</a>
+    <a href="admin.html">Admin</a>
+    <a href="contact.html">Contact Us</a>
+  </nav>
+</header>
+
+<section>
+  <div style="max-width:1000px;margin:40px auto;">
+    <div id="hero" style="display:flex;gap:30px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:320px;">
+        <img id="roomImage" src="" alt="room" style="width:100%;border-radius:10px;object-fit:cover;max-height:420px;">
+      </div>
+
+      <div style="flex:1;min-width:320px;">
+        <h2 id="roomTitle">Room</h2>
+        <p id="roomDesc" style="color:#4A6358;"></p>
+
+        <div style="margin-top:12px;">
+          <span class="price-pill" id="roomPrice">— BYN</span>
+        </div>
+
+        <div class="calendar-row">
+          <label>Check-in <input type="date" id="checkin"></label>
+          <label>Check-out <input type="date" id="checkout"></label>
+          <label>Guests
+            <select id="guests">
+              <option value="1">1 adult</option>
+              <option value="2">2 adults</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="actions">
+          <button id="checkAvailabilityBtn" style="background:var(--primary-teal);color:var(--light-ivory);padding:10px 16px;border-radius:8px;border:none;cursor:pointer;font-weight:700;">Check Availability</button>
+          <button id="sendRequestBtn" class="sold-out" style="display:none;">Send Request</button>
+        </div>
+
+        <p class="availability-note" id="availabilityNote"></p>
+      </div>
+    </div>
+
+    <div id="moreInfo" style="margin-top:28px;">
+      <h3>Amenities</h3>
+      <ul id="amenitiesList" style="color:#4A6358;"></ul>
+    </div>
+  </div>
+</section>
+
+<footer class="footer-structured">
+  <div class="footer-content">
+    <div class="footer-left">
+      <img src="footer-logo.png" alt="Hostel Logo" class="footer-logo">
+      <p class="footer-email"><img src="email-icon.png" class="email-icon">info@hostelname.com</p>
+    </div>
+    <div class="footer-right">
+      <h3>CONTACT NUMBERS</h3>
+      <p><strong>Storozhovskaya Street, 8</strong><br>+375 44 560-91-46</p>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2026 Hostel Name. All rights reserved.</div>
+</footer>
+
+<script>
+const API_BASE = "https://hostelbackend1.onrender.com";
+
+const ROOM_DATA = {
+  "8bed": {
+    id: "8bed",
+    title: "8-Bed Mixed Dorm",
+    desc: "Comfortable bunk beds, lockers, shared bathroom.",
+    price: 45,
+    image: "NAV03661.jpg",
+    amenities: ["Wi-Fi","Lockers","Shared bathroom","Linen"]
+  },
+  "10bed": {
+    id: "10bed",
+    title: "10-Bed Mixed Dorm",
+    desc: "Mixed dorm with cozy atmosphere.",
+    price: 35,
+    image: "10-dorms-room-athens-hawks.jpg",
+    amenities: ["Wi-Fi","Lockers","Shared bathroom"]
+  },
+  "single": {
+    id: "single",
+    title: "Single Bed Room",
+    desc: "Perfect for solo travelers.",
+    price: 55,
+    image: "caption.jpg",
+    amenities: ["Wi-Fi","Private bed","Desk"]
+  },
+  "private": {
+    id: "private",
+    title: "Private Room",
+    desc: "Perfect for couples or solo travelers.",
+    price: 120,
+    image: "The-Eden-Tampines-Pasir-Ris-Tampines-Singapore.jpg",
+    amenities: ["Private bathroom","Wi-Fi","TV"]
+  }
+};
+
+function qs(name) {
+  const params = new URLSearchParams(location.search);
+  return params.get(name);
+}
+
+function formatBYN(n){ return `${n} BYN`; }
+
+function showRoom(roomId){
+  const r = ROOM_DATA[roomId] || ROOM_DATA["8bed"];
+  document.getElementById("roomTitle").innerText = r.title;
+  document.getElementById("roomDesc").innerText = r.desc;
+  document.getElementById("roomPrice").innerText = formatBYN(r.price);
+  document.getElementById("roomImage").src = r.image;
+  const ul = document.getElementById("amenitiesList");
+  ul.innerHTML = "";
+  r.amenities.forEach(a => {
+    const li = document.createElement("li");
+    li.innerText = a;
+    ul.appendChild(li);
+  });
+}
+
+async function checkAvailability(roomId, checkin, checkout){
+  const note = document.getElementById("availabilityNote");
+  note.innerText = "Checking availability...";
+  try {
+    const res = await fetch(`${API_BASE}/api/availability?room=${roomId}&checkin=${checkin}&checkout=${checkout}`);
+    const data = await res.json();
+    // expected response: { available: true/false, message: "...", available_beds: [...] }
+    if (data.available) {
+      note.innerHTML = `<strong>Available</strong> — ${formatBYN(ROOM_DATA[roomId].price)} per night`;
+      showSelectButton(roomId, checkin, checkout);
+    } else {
+      note.innerHTML = `<strong>Not available</strong> — ${data.message || "Try different dates."}`;
+      showSoldOut();
+    }
+  } catch (err) {
+    note.innerText = "Unable to check availability. Try again later.";
+    showSoldOut();
+  }
+}
+
+function showSelectButton(roomId, checkin, checkout){
+  const btn = document.getElementById("checkAvailabilityBtn");
+  btn.innerText = "Select";
+  btn.style.background = "var(--accent-gold)";
+  btn.onclick = () => {
+    // redirect to booking page with params
+    const url = new URL("booking.html", location.href);
+    url.searchParams.set("room", roomId);
+    url.searchParams.set("checkin", checkin);
+    url.searchParams.set("checkout", checkout);
+    location.href = url.toString();
+  };
+  document.getElementById("sendRequestBtn").style.display = "none";
+}
+
+function showSoldOut(){
+  const btn = document.getElementById("checkAvailabilityBtn");
+  btn.innerText = "Check Availability";
+  btn.style.background = "var(--primary-teal)";
+  btn.onclick = handleCheckClick;
+  document.getElementById("sendRequestBtn").style.display = "inline-block";
+  document.getElementById("sendRequestBtn").onclick = () => {
+    alert("Request sent to hostel. We will contact you if a spot opens.");
+    // optionally implement API call to send request
+  };
+}
+
+function handleCheckClick(){
+  const roomId = qs("room") || "8bed";
+  const checkin = document.getElementById("checkin").value;
+  const checkout = document.getElementById("checkout").value;
+  if (!checkin || !checkout) {
+    alert("Please select both check-in and check-out dates.");
+    return;
+  }
+  checkAvailability(roomId, checkin, checkout);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const roomId = qs("room") || "8bed";
+  showRoom(roomId);
+
+  document.getElementById("checkAvailabilityBtn").addEventListener("click", handleCheckClick);
+});
+</script>
+</body>
+</html>
