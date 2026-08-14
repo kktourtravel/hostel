@@ -1,0 +1,164 @@
+<!-- booking-confirmation.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Booking Confirmed — Hostel Name</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .confirm-card { max-width:900px;margin:40px auto;padding:20px;border-radius:10px;background:var(--card-white);border:1px solid #C4DBD3;display:flex;gap:20px;align-items:flex-start; }
+    .qr { width:200px;height:200px;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;border:1px solid #E2ECE9; }
+    .actions { display:flex;gap:10px;margin-top:12px;flex-wrap:wrap; }
+    .actions a, .actions button { padding:10px 14px;border-radius:8px;border:none;cursor:pointer;font-weight:700;text-decoration:none; }
+    .download { background:var(--primary-teal); color:var(--light-ivory); }
+    .whatsapp { background:#25D366; color:#fff; }
+    .email { background:#126346; color:#fff; }
+  </style>
+</head>
+<body>
+<header>
+  <div class="logo">Hostel Name</div>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="rooms.html">Rooms</a>
+    <a href="booking.html">Booking</a>
+    <a href="admin.html">Admin</a>
+    <a href="contact.html">Contact Us</a>
+  </nav>
+</header>
+
+<section>
+  <div id="content" style="max-width:1100px;margin:40px auto;">
+    <div class="confirm-card">
+      <div style="flex:1;">
+        <h2>Your booking has been confirmed</h2>
+        <p id="bookingNumber" style="font-weight:800;color:var(--primary-teal);"></p>
+        <div id="bookingDetails" style="color:#4A6358;margin-top:8px;"></div>
+
+        <div class="actions">
+          <a id="downloadBtn" class="download" href="#" download>Download PDF</a>
+          <button id="printBtn">Print</button>
+          <a id="whatsappBtn" class="whatsapp" href="#" target="_blank">Send via WhatsApp</a>
+          <a id="emailBtn" class="email" href="#">Send via Email</a>
+        </div>
+
+        <div style="margin-top:18px;">
+          <button id="manageBtn" style="background:var(--accent-gold);color:var(--primary-teal);padding:10px 14px;border-radius:8px;border:none;font-weight:700;">Manage booking</button>
+        </div>
+      </div>
+
+      <div style="width:220px;text-align:center;">
+        <div class="qr" id="qrWrap">
+          <img id="qrImg" src="" alt="QR code" style="max-width:100%;max-height:100%;">
+        </div>
+        <p style="font-size:13px;color:#7A8B82;margin-top:8px;">Scan to view booking</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer-structured">
+  <div class="footer-content">
+    <div class="footer-left">
+      <img src="footer-logo.png" alt="Hostel Logo" class="footer-logo">
+      <p class="footer-email"><img src="email-icon.png" class="email-icon">info@hostelname.com</p>
+    </div>
+    <div class="footer-right">
+      <h3>CONTACT NUMBERS</h3>
+      <p><strong>Storozhovskaya Street, 8</strong><br>+375 44 560-91-46</p>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2026 Hostel Name. All rights reserved.</div>
+</footer>
+
+<script>
+const API_BASE = "https://hostelbackend1.onrender.com";
+
+function qs(name){ return new URLSearchParams(location.search).get(name); }
+
+async function fetchBooking(id){
+  try {
+    const res = await fetch(`${API_BASE}/api/booking/${encodeURIComponent(id)}`);
+    return await res.json();
+  } catch(e){
+    return null;
+  }
+}
+
+function generateQR(data){
+  // Use Google Chart API for QR image
+  const payload = encodeURIComponent(data);
+  return `https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=${payload}`;
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const id = qs("id");
+  const bookingNumberEl = document.getElementById("bookingNumber");
+  const detailsEl = document.getElementById("bookingDetails");
+  const qrImg = document.getElementById("qrImg");
+  const whatsappBtn = document.getElementById("whatsappBtn");
+  const emailBtn = document.getElementById("emailBtn");
+  const downloadBtn = document.getElementById("downloadBtn");
+  const printBtn = document.getElementById("printBtn");
+  const manageBtn = document.getElementById("manageBtn");
+
+  if (!id) {
+    bookingNumberEl.innerText = "Booking ID not found";
+    detailsEl.innerText = "If you were redirected here, please contact support.";
+    return;
+  }
+
+  // Try to fetch booking details from backend
+  const data = await fetchBooking(id);
+  let bookingData = data && data.status === "success" ? data.booking : null;
+
+  // If backend doesn't provide details, create a minimal fallback
+  if (!bookingData) {
+    bookingData = {
+      id,
+      room_name: "Room",
+      checkin: "",
+      checkout: "",
+      guest_name: "",
+      total: ""
+    };
+  }
+
+  bookingNumberEl.innerText = bookingData.id || id;
+  detailsEl.innerHTML = `
+    <div><strong>Guest:</strong> ${bookingData.guest_name || "-"}</div>
+    <div><strong>Room:</strong> ${bookingData.room_name || "-"}</div>
+    <div><strong>Dates:</strong> ${bookingData.checkin || "-"} — ${bookingData.checkout || "-"}</div>
+    <div><strong>Total:</strong> ${bookingData.total || "-"}</div>
+  `;
+
+  const qrData = `Booking:${bookingData.id || id};Guest:${bookingData.guest_name || ""};Room:${bookingData.room_name || ""};Dates:${bookingData.checkin || ""}-${bookingData.checkout || ""}`;
+  const qrUrl = generateQR(qrData);
+  qrImg.src = qrUrl;
+
+  // WhatsApp share link (opens chat with prefilled message)
+  const waText = encodeURIComponent(`Booking confirmed: ${bookingData.id || id}\nRoom: ${bookingData.room_name || ""}\nDates: ${bookingData.checkin || ""} — ${bookingData.checkout || ""}`);
+  whatsappBtn.href = `https://wa.me/?text=${waText}`;
+
+  // Email link (mailto)
+  const mailBody = encodeURIComponent(`Your booking is confirmed.\n\nBooking ID: ${bookingData.id || id}\nRoom: ${bookingData.room_name || ""}\nDates: ${bookingData.checkin || ""} — ${bookingData.checkout || ""}\n\nThank you.`);
+  emailBtn.href = `mailto:?subject=${encodeURIComponent("Booking confirmation")}&body=${mailBody}`;
+
+  // Download: create a simple printable page (PDF generation left to server or browser print)
+  downloadBtn.addEventListener("click", (e) => {
+    // open print-friendly page in new tab
+    const printUrl = `booking-confirmation-print.html?id=${encodeURIComponent(id)}`;
+    window.open(printUrl, "_blank");
+  });
+
+  printBtn.addEventListener("click", () => window.print());
+
+  manageBtn.addEventListener("click", () => {
+    // redirect to a manage page (implement server-side)
+    location.href = `manage-booking.html?id=${encodeURIComponent(id)}`;
+  });
+});
+</script>
+</body>
+</html>
