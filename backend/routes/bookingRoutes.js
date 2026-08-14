@@ -2,7 +2,10 @@ const express = require("express");
 const router = express.Router();
 const bookingController = require("../controllers/bookingController");
 
-router.get("/availability", bookingController.checkAvailability);
+// Create booking
 router.post("/book", bookingController.createBooking);
+
+// (IMPORTANT)
+// Remove availability from here — it belongs to roomRoutes.js
 
 module.exports = router;
