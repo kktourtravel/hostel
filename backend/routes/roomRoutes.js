@@ -2,11 +2,13 @@ const express = require("express");
 const router = express.Router();
 const roomController = require("../controllers/roomController");
 
-// Check availability for a specific room
+// Room availability
 router.get("/availability", roomController.checkAvailability);
 
-// (Optional future endpoints)
-// router.get("/:roomId", roomController.getRoomDetails);
-// router.get("/", roomController.getAllRooms);
+// Room list
+router.get("/list", roomController.getAllRooms);
+
+// Room details
+router.get("/:id", roomController.getRoomDetails);
 
 module.exports = router;
