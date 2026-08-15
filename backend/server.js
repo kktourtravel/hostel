@@ -13,7 +13,7 @@ app.use(express.json());
 // Public routes
 app.use("/api", bookingRoutes);
 
-// Room routes (availability, room details, etc.)
+// Room routes (availability, list, details)
 app.use("/api/room", roomRoutes);
 
 // Admin routes
