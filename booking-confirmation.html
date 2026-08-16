@@ -115,32 +115,32 @@ document.addEventListener("DOMContentLoaded", async () => {
     bookingData = {
       id,
       room_name: "Room",
-      checkin: "",
-      checkout: "",
-      guest_name: "",
-      total: ""
+      checkin_date: "",
+      checkout_date: "",
+      guest: { full_name:"", email:"", phone:"", country:"" },
+      total_price: ""
     };
   }
 
   bookingNumberEl.innerText = bookingData.id || id;
 
   detailsEl.innerHTML = `
-    <div><strong>Guest:</strong> ${bookingData.guest_name || "-"}</div>
+    <div><strong>Guest:</strong> ${bookingData.guest.full_name || "-"}</div>
     <div><strong>Room:</strong> ${bookingData.room_name || "-"}</div>
-    <div><strong>Dates:</strong> ${bookingData.checkin || "-"} — ${bookingData.checkout || "-"}</div>
-    <div><strong>Total:</strong> ${bookingData.total || "-"}</div>
+    <div><strong>Dates:</strong> ${bookingData.checkin_date || "-"} — ${bookingData.checkout_date || "-"}</div>
+    <div><strong>Total:</strong> ${bookingData.total_price || "-"}</div>
   `;
 
-  const qrData = `Booking:${bookingData.id};Guest:${bookingData.guest_name};Room:${bookingData.room_name};Dates:${bookingData.checkin}-${bookingData.checkout}`;
+  const qrData = `Booking:${bookingData.id};Guest:${bookingData.guest.full_name};Room:${bookingData.room_name};Dates:${bookingData.checkin_date}-${bookingData.checkout_date};Total:${bookingData.total_price}`;
   qrImg.src = generateQR(qrData);
 
   const waText = encodeURIComponent(
-    `Booking confirmed: ${bookingData.id}\nRoom: ${bookingData.room_name}\nDates: ${bookingData.checkin} — ${bookingData.checkout}`
+    `Booking confirmed: ${bookingData.id}\nGuest: ${bookingData.guest.full_name}\nRoom: ${bookingData.room_name}\nDates: ${bookingData.checkin_date} — ${bookingData.checkout_date}\nTotal: ${bookingData.total_price}`
   );
   whatsappBtn.href = `https://wa.me/?text=${waText}`;
 
   const mailBody = encodeURIComponent(
-    `Your booking is confirmed.\n\nBooking ID: ${bookingData.id}\nRoom: ${bookingData.room_name}\nDates: ${bookingData.checkin} — ${bookingData.checkout}\n\nThank you.`
+    `Your booking is confirmed.\n\nBooking ID: ${bookingData.id}\nGuest: ${bookingData.guest.full_name}\nRoom: ${bookingData.room_name}\nDates: ${bookingData.checkin_date} — ${bookingData.checkout_date}\nTotal: ${bookingData.total_price}\n\nThank you.`
   );
   emailBtn.href = `mailto:?subject=${encodeURIComponent("Booking confirmation")}&body=${mailBody}`;
 
