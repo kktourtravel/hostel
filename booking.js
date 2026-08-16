@@ -1,68 +1,86 @@
+// ===============================
 // Prevent selecting past dates
+// ===============================
 const today = new Date().toISOString().split("T")[0];
 
 const checkinInput = document.getElementById("checkin");
 const checkoutInput = document.getElementById("checkout");
 
+// Minimum date = today
 checkinInput.setAttribute("min", today);
 checkoutInput.setAttribute("min", today);
 
-// Force checkout to be at least the same day or later
+// When user selects check-in, update checkout minimum
 checkinInput.addEventListener("change", function () {
     checkoutInput.setAttribute("min", this.value);
 });
 
 
+// ===============================
+// API Base
+// ===============================
 const API_BASE = "https://hostelbackend1.onrender.com";
 let selectedBedId = null;
 
-// Load availability
+
+// ===============================
+// Load Availability
+// ===============================
 document.getElementById("checkAvailabilityBtn").addEventListener("click", async () => {
-    const checkin = document.getElementById("checkin").value;
-    const checkout = document.getElementById("checkout").value;
+    const checkin = checkinInput.value;
+    const checkout = checkoutInput.value;
 
     if (!checkin || !checkout) {
         alert("Please select both dates.");
         return;
     }
 
-    const res = await fetch(`${API_BASE}/api/availability?checkin=${checkin}&checkout=${checkout}`);
-    const data = await res.json();
+    try {
+        const res = await fetch(`${API_BASE}/api/availability?checkin=${checkin}&checkout=${checkout}`);
+        const data = await res.json();
 
-    const container = document.getElementById("bedsContainer");
-    container.innerHTML = "";
+        const container = document.getElementById("bedsContainer");
+        container.innerHTML = "";
 
-    if (!data.available_beds || data.available_beds.length === 0) {
-        container.innerHTML = "<p>No beds available.</p>";
-        return;
+        if (!data.available_beds || data.available_beds.length === 0) {
+            container.innerHTML = "<p>No beds available.</p>";
+            return;
+        }
+
+        data.available_beds.forEach(bed => {
+            const div = document.createElement("div");
+            div.className = "room-card-body";
+            div.style.border = "1px solid #ddd";
+            div.style.padding = "10px";
+            div.style.marginBottom = "10px";
+            div.style.cursor = "pointer";
+
+            div.innerHTML = `
+                <strong>${bed.bed_code}</strong><br>
+                Room ID: ${bed.room_id}
+            `;
+
+            div.onclick = () => {
+                selectedBedId = bed.bed_id;
+                document.getElementById("summaryBed").innerText = `Selected Bed: ${bed.bed_code}`;
+            };
+
+            container.appendChild(div);
+        });
+
+    } catch (err) {
+        console.error("Availability error:", err);
+        alert("Unable to check availability. Try again later.");
     }
-
-    data.available_beds.forEach(bed => {
-        const div = document.createElement("div");
-        div.className = "room-card-body";
-        div.style.border = "1px solid #ddd";
-        div.style.padding = "10px";
-        div.style.marginBottom = "10px";
-        div.style.cursor = "pointer";
-
-        div.innerHTML = `
-            <strong>${bed.bed_code}</strong><br>
-            Room ID: ${bed.room_id}
-        `;
-
-        div.onclick = () => {
-            selectedBedId = bed.bed_id;
-            document.getElementById("summaryBed").innerText = `Selected Bed: ${bed.bed_code}`;
-        };
-
-        container.appendChild(div);
-    });
 });
 
-// Update summary
+
+// ===============================
+// Update Summary
+// ===============================
 function updateSummary() {
-    const checkin = document.getElementById("checkin").value;
-    const checkout = document.getElementById("checkout").value;
+    const checkin = checkinInput.value;
+    const checkout = checkoutInput.value;
 
     const name = document.getElementById("guestName").value;
     const email = document.getElementById("guestEmail").value;
@@ -80,7 +98,10 @@ document.querySelectorAll(".booking-wrapper input").forEach(input => {
     input.addEventListener("input", updateSummary);
 });
 
-// Confirm booking
+
+// ===============================
+// Confirm Booking
+// ===============================
 document.getElementById("confirmBookingBtn").addEventListener("click", async () => {
     if (!selectedBedId) {
         alert("Please select a bed.");
@@ -95,22 +116,28 @@ document.getElementById("confirmBookingBtn").addEventListener("click", async () 
             phone: document.getElementById("guestPhone").value,
             country: document.getElementById("guestCountry").value
         },
-        checkin_date: document.getElementById("checkin").value,
-        checkout_date: document.getElementById("checkout").value
+        checkin_date: checkinInput.value,
+        checkout_date: checkoutInput.value
     };
 
-    const res = await fetch(`${API_BASE}/api/book`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-    });
+    try {
+        const res = await fetch(`${API_BASE}/api/book`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
 
-    const data = await res.json();
+        const data = await res.json();
 
-    if (data.status === "success") {
-        alert("Booking confirmed!");
-        window.location.href = `booking-confirmation.html?id=${data.booking_id}`;
-    } else {
-        alert("Booking failed.");
+        if (data.status === "success") {
+            alert("Booking confirmed!");
+            window.location.href = `booking-confirmation.html?id=${data.booking_id}`;
+        } else {
+            alert("Booking failed.");
+        }
+
+    } catch (err) {
+        console.error("Booking error:", err);
+        alert("Booking failed. Please try again.");
     }
 });
