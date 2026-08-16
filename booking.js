@@ -1,3 +1,18 @@
+// Prevent selecting past dates
+const today = new Date().toISOString().split("T")[0];
+
+const checkinInput = document.getElementById("checkin");
+const checkoutInput = document.getElementById("checkout");
+
+checkinInput.setAttribute("min", today);
+checkoutInput.setAttribute("min", today);
+
+// Force checkout to be at least the same day or later
+checkinInput.addEventListener("change", function () {
+    checkoutInput.setAttribute("min", this.value);
+});
+
+
 const API_BASE = "https://hostelbackend1.onrender.com";
 let selectedBedId = null;
 
