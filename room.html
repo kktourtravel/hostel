@@ -152,6 +152,25 @@ function showRoom(roomId){
   });
 }
 
+// ⭐ BLOCK PAST DATES
+document.addEventListener("DOMContentLoaded", () => {
+  const today = new Date().toISOString().split("T")[0];
+  const checkinInput = document.getElementById("checkin");
+  const checkoutInput = document.getElementById("checkout");
+
+  checkinInput.setAttribute("min", today);
+  checkoutInput.setAttribute("min", today);
+
+  checkinInput.addEventListener("change", function () {
+    checkoutInput.setAttribute("min", this.value);
+  });
+
+  const roomId = qs("room") || "8bed";
+  showRoom(roomId);
+
+  document.getElementById("checkAvailabilityBtn").addEventListener("click", handleCheckClick);
+});
+
 async function checkAvailability(roomId, checkin, checkout){
   const note = document.getElementById("availabilityNote");
   note.innerText = "Checking availability...";
@@ -178,11 +197,7 @@ function showSelectButton(roomId, checkin, checkout){
   btn.innerText = "Select";
   btn.style.background = "var(--accent-gold)";
   btn.onclick = () => {
-    const url = new URL("booking.html", location.href);
-    url.searchParams.set("room", roomId);
-    url.searchParams.set("checkin", checkin);
-    url.searchParams.set("checkout", checkout);
-    location.href = url.toString();
+    location.href = `booking.html?room=${roomId}&checkin=${checkin}&checkout=${checkout}`;
   };
 
   document.getElementById("sendRequestBtn").style.display = "none";
@@ -218,13 +233,6 @@ function handleCheckClick(){
 
   checkAvailability(roomId, checkin, checkout);
 }
-
-document.addEventListener("DOMContentLoaded", () => {
-  const roomId = qs("room") || "8bed";
-  showRoom(roomId);
-
-  document.getElementById("checkAvailabilityBtn").addEventListener("click", handleCheckClick);
-});
 </script>
 
 </body>
