@@ -17,9 +17,23 @@
     }
     .availability-note { margin-top:12px; color:#7A8B82; }
     .calendar-row { display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-top:14px; }
-    .calendar-row input { padding:10px; border-radius:6px; border:1px solid #A3C4B8; background:var(--light-ivory); }
+    .calendar-row input,
+    .calendar-row select {
+      padding:10px;
+      border-radius:6px;
+      border:1px solid #A3C4B8;
+      background:var(--light-ivory);
+    }
     .actions { margin-top:18px; display:flex; gap:12px; }
-    .sold-out { background:#f5f5f5; color:#b33; padding:10px 14px; border-radius:8px; font-weight:700; }
+    .sold-out {
+      background:#f5f5f5;
+      color:#b33;
+      padding:10px 14px;
+      border-radius:8px;
+      font-weight:700;
+      border:none;
+      cursor:pointer;
+    }
   </style>
 </head>
 <body>
@@ -51,8 +65,12 @@
         </div>
 
         <div class="calendar-row">
-          <label>Check-in <input type="date" id="checkin"></label>
-          <label>Check-out <input type="date" id="checkout"></label>
+          <label>Check-in
+            <input type="date" id="checkin">
+          </label>
+          <label>Check-out
+            <input type="date" id="checkout">
+          </label>
           <label>Guests
             <select id="guests">
               <option value="1">1 adult</option>
@@ -62,8 +80,13 @@
         </div>
 
         <div class="actions">
-          <button id="checkAvailabilityBtn" style="background:var(--primary-teal);color:var(--light-ivory);padding:10px 16px;border-radius:8px;border:none;cursor:pointer;font-weight:700;">Check Availability</button>
-          <button id="sendRequestBtn" class="sold-out" style="display:none;">Send Request</button>
+          <button id="checkAvailabilityBtn"
+                  style="background:var(--primary-teal);color:var(--light-ivory);padding:10px 16px;border-radius:8px;border:none;cursor:pointer;font-weight:700;">
+            Check Availability
+          </button>
+          <button id="sendRequestBtn" class="sold-out" style="display:none;">
+            Send Request
+          </button>
         </div>
 
         <p class="availability-note" id="availabilityNote"></p>
@@ -92,78 +115,184 @@
 </footer>
 
 <script>
+const API_BASE = "https://hostelbackend1.onrender.com";
 const roomId = new URLSearchParams(window.location.search).get("room");
-let selectedCheckin = null;
-let selectedCheckout = null;
 
-async function loadCalendar(month) {
-    const res = await fetch(`/api/room/calendar?room=${roomId}&month=${month}`);
+// Map rooms.html → room.html details
+const ROOM_CONFIG = {
+  "8bed": {
+    title: "8-Bed Mixed Dorm",
+    desc: "Comfortable bunk beds, lockers, shared bathroom.",
+    price: "45 BYN",
+    image: "NAV03661.jpg",
+    amenities: ["Wi-Fi", "Lockers", "Shared bathroom", "Linen"]
+  },
+  "10bed": {
+    title: "10-Bed Mixed Dorm",
+    desc: "Mixed dorm with cozy atmosphere.",
+    price: "35 BYN",
+    image: "10-dorms-room-athens-hawks.jpg",
+    amenities: ["Wi-Fi", "Lockers", "Shared bathroom"]
+  },
+  "single": {
+    title: "Single Bed Room",
+    desc: "Perfect for solo travelers.",
+    price: "55 BYN",
+    image: "caption.jpg",
+    amenities: ["Wi-Fi", "Private bathroom", "Linen"]
+  },
+  "private": {
+    title: "Private Room",
+    desc: "Perfect for couples or solo travelers.",
+    price: "120 BYN",
+    image: "The-Eden-Tampines-Pasir-Ris-Tampines-Singapore.jpg",
+    amenities: ["Wi-Fi", "Private bathroom", "Linen"]
+  }
+};
+
+let calendarDays = {}; // { "2026-08-18": "available" | "unavailable" | ... }
+
+// Apply room details
+function applyRoomDetails() {
+  const cfg = ROOM_CONFIG[roomId];
+  if (!cfg) return;
+
+  document.getElementById("roomTitle").innerText = cfg.title;
+  document.getElementById("roomDesc").innerText = cfg.desc;
+  document.getElementById("roomPrice").innerText = cfg.price;
+  document.getElementById("roomImage").src = cfg.image;
+
+  const amenitiesList = document.getElementById("amenitiesList");
+  amenitiesList.innerHTML = "";
+  cfg.amenities.forEach(a => {
+    const li = document.createElement("li");
+    li.textContent = a;
+    amenitiesList.appendChild(li);
+  });
+}
+
+// Load calendar availability for current month
+async function loadCalendar() {
+  try {
+    const today = new Date();
+    const month = today.toISOString().slice(0, 7); // YYYY-MM
+    const res = await fetch(`${API_BASE}/api/room/calendar?room=${roomId}&month=${month}`);
     const data = await res.json();
 
-    data.days.forEach(day => {
-        const el = document.querySelector(`[data-date="${day.date}"]`);
-        if (!el) return;
-
-        el.classList.remove("available-day", "disabled-day", "selected-day");
-
-        if (day.status === "available") {
-            el.classList.add("available-day");
-        } else {
-            el.classList.add("disabled-day");
-        }
-
-        el.onclick = () => selectDate(day.date, day.status);
-    });
+    calendarDays = {};
+    if (data.days && Array.isArray(data.days)) {
+      data.days.forEach(day => {
+        calendarDays[day.date] = day.status; // date: "2026-08-18", status: "available" / "unavailable"
+      });
+    }
+  } catch (e) {
+    console.error("Failed to load calendar", e);
+  }
 }
 
-function selectDate(date, status) {
-    if (status !== "available") return;
+function isDateAvailable(dateStr) {
+  // If backend marks it as unavailable, block it
+  if (calendarDays[dateStr] && calendarDays[dateStr] !== "available") {
+    return false;
+  }
+  return true;
+}
 
-    if (!selectedCheckin) {
-        selectedCheckin = date;
-    } else if (!selectedCheckout) {
-        if (date <= selectedCheckin) return;
-        selectedCheckout = date;
-    } else {
-        selectedCheckin = date;
-        selectedCheckout = null;
+// Prevent past dates
+function setupDateInputs() {
+  const checkinInput = document.getElementById("checkin");
+  const checkoutInput = document.getElementById("checkout");
+
+  const todayStr = new Date().toISOString().split("T")[0];
+  checkinInput.setAttribute("min", todayStr);
+  checkoutInput.setAttribute("min", todayStr);
+
+  checkinInput.addEventListener("change", function () {
+    const val = this.value;
+    if (!val) return;
+
+    // Block unavailable check-in
+    if (!isDateAvailable(val)) {
+      alert("Selected check-in date is not available.");
+      this.value = "";
+      return;
     }
 
-    highlightSelection();
+    // Force checkout to be same or later
+    checkoutInput.setAttribute("min", val);
+  });
+
+  checkoutInput.addEventListener("change", function () {
+    const val = this.value;
+    if (!val) return;
+
+    // Block unavailable checkout
+    if (!isDateAvailable(val)) {
+      alert("Selected check-out date is not available.");
+      this.value = "";
+      return;
+    }
+  });
 }
 
-function highlightSelection() {
-    document.querySelectorAll(".calendar-day").forEach(el => {
-        el.classList.remove("selected-day");
-    });
+// Check availability and either go to booking or show request
+function setupActions() {
+  const checkBtn = document.getElementById("checkAvailabilityBtn");
+  const sendRequestBtn = document.getElementById("sendRequestBtn");
+  const note = document.getElementById("availabilityNote");
 
-    if (!selectedCheckin) return;
+  checkBtn.addEventListener("click", async () => {
+    const checkin = document.getElementById("checkin").value;
+    const checkout = document.getElementById("checkout").value;
+    const guests = document.getElementById("guests").value;
 
-    const start = selectedCheckin;
-    const end = selectedCheckout || selectedCheckin;
-
-    document.querySelectorAll(".calendar-day").forEach(el => {
-        const d = el.dataset.date;
-        if (d >= start && d <= end) {
-            el.classList.add("selected-day");
-        }
-    });
-}
-
-function goToBooking() {
-    if (!selectedCheckin || !selectedCheckout) {
-        alert("Please select check-in and check-out dates.");
-        return;
+    if (!checkin || !checkout) {
+      alert("Please select both check-in and check-out dates.");
+      return;
     }
 
-    window.location.href =
-        `booking.html?room=${roomId}&checkin=${selectedCheckin}&checkout=${selectedCheckout}`;
+    // Final guard: if any selected date is marked unavailable, block
+    if (!isDateAvailable(checkin) || !isDateAvailable(checkout)) {
+      note.innerText = "Selected dates are not available. Please choose different dates.";
+      sendRequestBtn.style.display = "inline-block";
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        `${API_BASE}/api/availability?room=${roomId}&checkin=${checkin}&checkout=${checkout}&guests=${guests}`
+      );
+      const data = await res.json();
+
+      if (data.status === "available") {
+        note.innerText = "Room is available for selected dates.";
+        sendRequestBtn.style.display = "none";
+
+        // Go to booking page with prefilled params
+        window.location.href =
+          `booking.html?room=${roomId}&checkin=${checkin}&checkout=${checkout}&guests=${guests}`;
+      } else {
+        note.innerText = "Room is not available for selected dates.";
+        sendRequestBtn.style.display = "inline-block";
+      }
+    } catch (e) {
+      console.error("Availability check failed", e);
+      note.innerText = "Unable to check availability. Try again later.";
+    }
+  });
+
+  sendRequestBtn.addEventListener("click", () => {
+    alert("Please contact reception or send a manual request for these dates.");
+  });
 }
 
-// Load current month
-const today = new Date();
-const month = today.toISOString().slice(0, 7);
-loadCalendar(month);
+// Init
+(async function initRoomPage() {
+  applyRoomDetails();
+  await loadCalendar();
+  setupDateInputs();
+  setupActions();
+})();
 </script>
 
 </body>
