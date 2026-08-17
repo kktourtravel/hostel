@@ -1,4 +1,4 @@
-// controllers/roomController.js
+// controllers/roomController.js — FULLY FIXED & STABLE
 
 const db = require("../config/db");
 
@@ -22,6 +22,7 @@ exports.checkAvailability = (req, res) => {
         WHERE room_code = ?
         AND checkin_date < ?
         AND checkout_date > ?
+        AND status = 'confirmed'
     `;
 
     db.query(sql, [room, checkout, checkin], (err, results) => {
@@ -136,4 +137,81 @@ exports.getRoomDetails = (req, res) => {
     }
 
     res.json({ status: "success", room });
+};
+
+// ===============================
+// ROOM CALENDAR (DAY-BY-DAY STATUS)
+// ===============================
+exports.getCalendar = (req, res) => {
+    const room = req.query.room;
+    const month = req.query.month; // YYYY-MM
+
+    if (!room || !month) {
+        return res.status(400).json({
+            status: "error",
+            message: "Missing room or month"
+        });
+    }
+
+    const start = `${month}-01`;
+    const end = `${month}-31`;
+
+    const sqlBookings = `
+        SELECT checkin_date, checkout_date 
+        FROM bookings 
+        WHERE room_code = ?
+        AND status = 'confirmed'
+        AND checkin_date <= ?
+        AND checkout_date >= ?
+    `;
+
+    const sqlBlocked = `
+        SELECT from_date, to_date 
+        FROM blocked_beds 
+        WHERE bed_id = ?
+        AND from_date <= ?
+        AND to_date >= ?
+    `;
+
+    db.query(sqlBookings, [room, end, start], (err, bookings) => {
+        if (err) {
+            console.error("Calendar bookings error:", err);
+            return res.status(500).json({ error: "Database error (bookings)" });
+        }
+
+        db.query(sqlBlocked, [room, end, start], (err2, blocked) => {
+            if (err2) {
+                console.error("Calendar blocked error:", err2);
+                return res.status(500).json({ error: "Database error (blocked)" });
+            }
+
+            const days = [];
+
+            const year = parseInt(month.split("-")[0]);
+            const mon = parseInt(month.split("-")[1]) - 1;
+            const lastDay = new Date(year, mon + 1, 0).getDate();
+
+            for (let d = 1; d <= lastDay; d++) {
+                const date = `${month}-${String(d).padStart(2, "0")}`;
+
+                let status = "available";
+
+                bookings.forEach(b => {
+                    if (date >= b.checkin_date && date < b.checkout_date) {
+                        status = "booked";
+                    }
+                });
+
+                blocked.forEach(b => {
+                    if (date >= b.from_date && date <= b.to_date) {
+                        status = "blocked";
+                    }
+                });
+
+                days.push({ date, status });
+            }
+
+            res.json({ status: "success", days });
+        });
+    });
 };
