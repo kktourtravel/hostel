@@ -10,11 +10,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Public routes
-app.use("/api", bookingRoutes);
-
 // Room routes (availability, list, details)
 app.use("/api/room", roomRoutes);
+
+
+// Public routes
+app.use("/api", bookingRoutes);
 
 // Admin routes
 app.use("/api/admin", adminRoutes);
