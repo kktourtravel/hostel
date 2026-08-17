@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+<header>
+  <div class="logo">Hostel Name</div>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="rooms.html">Rooms</a>
+    <a href="booking.html">Booking</a>
+    <a href="admin.html">Admin</a>
+  </nav>
+</header>
+
+<section>
+  <h2>Admin Booking Dashboard</h2>
+
+  <div class="filters">
+    <input type="date" id="filterFrom">
+    <input type="date" id="filterTo">
+    <input type="text" id="filterGuest" placeholder="Guest name">
+    <button id="applyFiltersBtn">Apply Filters</button>
+    <button id="exportExcelBtn">Export Excel</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Guest</th>
+        <th>Room</th>
+        <th>Check-in</th>
+        <th>Check-out</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="bookingTable"></tbody>
+  </table>
+</section>
+
+<script src="dashboard.js"></script>
+</body>
+</html>
