@@ -8,8 +8,7 @@ const sendEmail = require("../utils/sendEmail");
 // ===============================
 exports.createBooking = async (req, res) => {
     const {
-        bed_id,
-        room_id,
+        room_id,          // MUST match roomController calendar
         room_name,
         price_per_night,
         guest,
@@ -17,7 +16,7 @@ exports.createBooking = async (req, res) => {
         checkout_date
     } = req.body;
 
-    if (!bed_id || !checkin_date || !checkout_date || !guest || !guest.full_name) {
+    if (!room_id || !checkin_date || !checkout_date || !guest || !guest.full_name) {
         return res.status(400).json({
             status: "error",
             message: "Missing required fields."
@@ -35,12 +34,11 @@ exports.createBooking = async (req, res) => {
         // Insert booking
         const sql = `
             INSERT INTO bookings 
-            (bed_id, room_code, room_name, guest_name, guest_email, guest_phone, country, notes, checkin_date, checkout_date, total_price, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'confirmed')
+            (room_code, room_name, guest_name, guest_email, guest_phone, country, notes, checkin_date, checkout_date, total_price, status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'confirmed')
         `;
 
         const result = await db.query(sql, [
-            bed_id,
             room_id,
             room_name,
             guest.full_name,
@@ -55,8 +53,8 @@ exports.createBooking = async (req, res) => {
 
         const booking_id = result.insertId;
 
-        // BLOCK DATES
-        await blockDates(bed_id, checkin_date, checkout_date);
+        // BLOCK DATES (IMPORTANT)
+        await blockDates(room_id, checkin_date, checkout_date);
 
         // Send confirmation email (non-blocking)
         try {
@@ -85,9 +83,9 @@ exports.createBooking = async (req, res) => {
 };
 
 // ===============================
-// BLOCK DATES FOR THIS BED
+// BLOCK DATES FOR THIS ROOM
 // ===============================
-async function blockDates(bed_id, checkin, checkout) {
+async function blockDates(room_id, checkin, checkout) {
     let current = new Date(checkin);
     const end = new Date(checkout);
 
@@ -96,7 +94,7 @@ async function blockDates(bed_id, checkin, checkout) {
 
         await db.query(
             "INSERT INTO blocked_beds (bed_id, from_date, to_date) VALUES (?, ?, ?)",
-            [bed_id, dateStr, dateStr]
+            [room_id, dateStr, dateStr]
         );
 
         current.setDate(current.getDate() + 1);
