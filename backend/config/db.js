@@ -1,5 +1,3 @@
-// db.js — FIXED & STABLE
-
 const mysql = require("mysql2");
 
 const db = mysql.createPool({
@@ -22,4 +20,5 @@ db.getConnection((err, connection) => {
     }
 });
 
-module.exports = db;
+// IMPORTANT: enable async/await support
+module.exports = db.promise();
