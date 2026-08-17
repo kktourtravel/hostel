@@ -1,10 +1,11 @@
 const API_BASE = "https://hostelbackend1.onrender.com";
 
 // Protect dashboard
-const token = localStorage.getItem("adminToken");
-if (!token) {
+// Protect dashboard
+if (localStorage.getItem("isAdminLoggedIn") !== "true") {
     window.location.href = "admin.html";
 }
+
 
 // Load bookings
 async function loadBookings() {
