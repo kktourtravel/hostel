@@ -1,4 +1,4 @@
-const API_BASE = "https://hostelbackend1.onrender.com";
+const API_BASE = "https://hostelbackend.onrender.com";
 
 document.getElementById("adminLoginBtn").addEventListener("click", async () => {
     const email = document.getElementById("adminEmail").value;
