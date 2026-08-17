@@ -199,49 +199,54 @@ function isDateAvailable(dateStr) {
 }
 
 // Prevent past dates
+function toYMD(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
 function setupDateInputs() {
   const checkinInput = document.getElementById("checkin");
   const checkoutInput = document.getElementById("checkout");
 
-  // Today
+  // Today (local)
   const today = new Date();
-  const todayStr = today.toISOString().split("T")[0];
+  const todayStr = toYMD(today);
 
-  // Tomorrow
+  // Tomorrow (local)
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
-  const tomorrowStr = tomorrow.toISOString().split("T")[0];
+  const tomorrowStr = toYMD(tomorrow);
 
- // FORCE the browser to block past dates
+  // Block past dates
   checkinInput.min = todayStr;
   checkoutInput.min = tomorrowStr;
-  
-  // Auto‑adjust checkout when check‑in changes
+
+  // Auto‑fill initial values
+  checkinInput.value = todayStr;
+  checkoutInput.value = tomorrowStr;
+
   checkinInput.addEventListener("change", function () {
     const val = this.value;
     if (!val) return;
 
-    // Block unavailable check‑in
     if (!isDateAvailable(val)) {
       alert("Selected check‑in date is not available.");
       this.value = "";
       return;
     }
 
-    // Set checkout minimum = check‑in + 1 day
     const nextDay = new Date(val);
     nextDay.setDate(nextDay.getDate() + 1);
-    const nextDayStr = nextDay.toISOString().split("T")[0];
+    const nextDayStr = toYMD(nextDay);
 
-    checkoutInput.setAttribute("min", nextDayStr);
-
-    // If checkout is earlier than new min, reset it
+    checkoutInput.min = nextDayStr;
     if (checkoutInput.value < nextDayStr) {
       checkoutInput.value = "";
     }
   });
 
-  // Block unavailable checkout
   checkoutInput.addEventListener("change", function () {
     const val = this.value;
     if (!val) return;
