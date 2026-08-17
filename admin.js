@@ -1,31 +1,18 @@
-const API_BASE = "https://hostelbackend.onrender.com";
-
-document.getElementById("adminLoginBtn").addEventListener("click", async () => {
+document.getElementById("adminLoginBtn").addEventListener("click", () => {
     const email = document.getElementById("adminEmail").value;
     const password = document.getElementById("adminPassword").value;
 
-    if (!email || !password) {
-        alert(email !== "crish2way@gmail.com" || password !== "Avaparuhang@251");
-        return;
-    }
+    // Your credentials
+    const ADMIN_EMAIL = "crish2way@gmail.com";
+    const ADMIN_PASS = "Avaparuhang@251";
 
-    try {
-        const res = await fetch(`${API_BASE}/api/admin/login`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password })
-        });
+    if (email === ADMIN_EMAIL && password === ADMIN_PASS) {
+        // Save login state
+        localStorage.setItem("isAdminLoggedIn", "true");
 
-        const data = await res.json();
-
-        if (data.status === "success") {
-            localStorage.setItem("adminToken", data.token);
-            window.location.href = "dashboard.html";
-        } else {
-            alert("Invalid credentials.");
-        }
-
-    } catch (err) {
-        alert("Login failed. Try again.");
+        // Redirect to dashboard
+        window.location.href = "adminDashboard.html";
+    } else {
+        alert("Invalid credentials.");
     }
 });
