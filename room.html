@@ -203,32 +203,51 @@ function setupDateInputs() {
   const checkinInput = document.getElementById("checkin");
   const checkoutInput = document.getElementById("checkout");
 
-  const todayStr = new Date().toISOString().split("T")[0];
-  checkinInput.setAttribute("min", todayStr);
-  checkoutInput.setAttribute("min", todayStr);
+  // Today
+  const today = new Date();
+  const todayStr = today.toISOString().split("T")[0];
 
+  // Tomorrow
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+  const tomorrowStr = tomorrow.toISOString().split("T")[0];
+
+  // Set minimums
+  checkinInput.setAttribute("min", todayStr);
+  checkoutInput.setAttribute("min", tomorrowStr);
+
+  // Auto‑adjust checkout when check‑in changes
   checkinInput.addEventListener("change", function () {
     const val = this.value;
     if (!val) return;
 
-    // Block unavailable check-in
+    // Block unavailable check‑in
     if (!isDateAvailable(val)) {
-      alert("Selected check-in date is not available.");
+      alert("Selected check‑in date is not available.");
       this.value = "";
       return;
     }
 
-    // Force checkout to be same or later
-    checkoutInput.setAttribute("min", val);
+    // Set checkout minimum = check‑in + 1 day
+    const nextDay = new Date(val);
+    nextDay.setDate(nextDay.getDate() + 1);
+    const nextDayStr = nextDay.toISOString().split("T")[0];
+
+    checkoutInput.setAttribute("min", nextDayStr);
+
+    // If checkout is earlier than new min, reset it
+    if (checkoutInput.value < nextDayStr) {
+      checkoutInput.value = "";
+    }
   });
 
+  // Block unavailable checkout
   checkoutInput.addEventListener("change", function () {
     const val = this.value;
     if (!val) return;
 
-    // Block unavailable checkout
     if (!isDateAvailable(val)) {
-      alert("Selected check-out date is not available.");
+      alert("Selected check‑out date is not available.");
       this.value = "";
       return;
     }
