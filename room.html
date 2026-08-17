@@ -212,10 +212,10 @@ function setupDateInputs() {
   tomorrow.setDate(today.getDate() + 1);
   const tomorrowStr = tomorrow.toISOString().split("T")[0];
 
-  // Set minimums
-  checkinInput.setAttribute("min", todayStr);
-  checkoutInput.setAttribute("min", tomorrowStr);
-
+ // FORCE the browser to block past dates
+  checkinInput.min = todayStr;
+  checkoutInput.min = tomorrowStr;
+  
   // Auto‑adjust checkout when check‑in changes
   checkinInput.addEventListener("change", function () {
     const val = this.value;
