@@ -115,110 +115,113 @@
 </footer>
 
 <script>
-const API_BASE = "https://hostelbackend1.onrender.com";
+const params = new URLSearchParams(window.location.search);
+const roomId = params.get("room");
+let checkin = params.get("checkin");
+let checkout = params.get("checkout");
 
-const ROOM_DATA = {
-  "8bed": { title:"8-Bed Mixed Dorm", price:45 },
-  "10bed": { title:"10-Bed Mixed Dorm", price:35 },
-  "single": { title:"Single Bed Room", price:55 },
-  "private": { title:"Private Room", price:120 }
-};
+async function loadCalendar(month) {
+    const res = await fetch(`/api/room/calendar?room=${roomId}&month=${month}`);
+    const data = await res.json();
 
-function qs(name){ return new URLSearchParams(location.search).get(name); }
+    data.days.forEach(day => {
+        const el = document.querySelector(`[data-date="${day.date}"]`);
+        if (!el) return;
 
-function daysBetween(a,b){
-  const d1 = new Date(a), d2 = new Date(b);
-  const diff = Math.ceil((d2 - d1) / (1000*60*60*24));
-  return diff > 0 ? diff : 0;
+        el.classList.remove("available-day", "disabled-day", "selected-day");
+
+        if (day.status === "available") {
+            el.classList.add("available-day");
+        } else {
+            el.classList.add("disabled-day");
+        }
+
+        el.onclick = () => selectDate(day.date, day.status);
+    });
+
+    highlightSelection();
 }
 
-function formatBYN(n){ return `${n} BYN`; }
+function selectDate(date, status) {
+    if (status !== "available") return;
 
-document.addEventListener("DOMContentLoaded", () => {
-
-  // ⭐ BLOCK PAST DATES
-  const today = new Date().toISOString().split("T")[0];
-  const ciInput = document.getElementById("checkin");
-  const coInput = document.getElementById("checkout");
-
-  ciInput.setAttribute("min", today);
-  coInput.setAttribute("min", today);
-
-  ciInput.addEventListener("change", function(){
-    coInput.setAttribute("min", this.value);
-  });
-
-  // ⭐ LOAD ROOM + DATES FROM URL
-  const room = qs("room") || "8bed";
-  const checkin = qs("checkin") || "";
-  const checkout = qs("checkout") || "";
-
-  const roomInfo = ROOM_DATA[room];
-  document.getElementById("roomName").value = roomInfo.title;
-  document.getElementById("checkin").value = checkin;
-  document.getElementById("checkout").value = checkout;
-
-  // ⭐ SUMMARY UPDATE
-  function updateSummary(){
-    const ci = ciInput.value;
-    const co = coInput.value;
-    const nights = daysBetween(ci, co);
-
-    document.getElementById("summaryRoom").innerText = roomInfo.title;
-    document.getElementById("summaryDates").innerText = ci && co ? `${ci} — ${co}` : "—";
-    document.getElementById("summaryNights").innerText = nights ? `${nights} night(s)` : "—";
-    document.getElementById("summaryPrice").innerText = formatBYN(roomInfo.price);
-    document.getElementById("summaryTotal").innerText = nights ? formatBYN(nights * roomInfo.price) : "—";
-  }
-
-  ciInput.addEventListener("change", updateSummary);
-  coInput.addEventListener("change", updateSummary);
-  updateSummary();
-
-  // ⭐ BOOKING SUBMIT
-  document.getElementById("bookNowBtn").addEventListener("click", async () => {
-    const full_name = document.getElementById("guestName").value.trim();
-    const email = document.getElementById("guestEmail").value.trim();
-    const phone = document.getElementById("guestPhone").value.trim();
-    const country = document.getElementById("guestCountry").value.trim();
-    const notes = document.getElementById("guestNotes").value.trim();
-    const ci = ciInput.value;
-    const co = coInput.value;
-
-    if (!full_name || !email || !phone || !ci || !co) {
-      alert("Please fill in all required fields.");
-      return;
+    if (!checkin) {
+        checkin = date;
+    } else if (!checkout) {
+        if (date <= checkin) return;
+        checkout = date;
+    } else {
+        checkin = date;
+        checkout = null;
     }
 
-    const payload = {
-      room_id: room,
-      room_name: roomInfo.title,
-      price_per_night: roomInfo.price,
-      guest: { full_name, email, phone, country, notes },
-      checkin_date: ci,
-      checkout_date: co
+    highlightSelection();
+    updateSummary();
+}
+
+function highlightSelection() {
+    document.querySelectorAll(".calendar-day").forEach(el => {
+        el.classList.remove("selected-day");
+    });
+
+    if (!checkin) return;
+
+    const start = checkin;
+    const end = checkout || checkin;
+
+    document.querySelectorAll(".calendar-day").forEach(el => {
+        const d = el.dataset.date;
+        if (d >= start && d <= end) {
+            el.classList.add("selected-day");
+        }
+    });
+}
+
+function updateSummary() {
+    if (!checkin || !checkout) return;
+
+    const nights =
+        (new Date(checkout) - new Date(checkin)) / (1000 * 60 * 60 * 24);
+
+    document.getElementById("summaryCheckin").innerText = checkin;
+    document.getElementById("summaryCheckout").innerText = checkout;
+    document.getElementById("summaryNights").innerText = nights;
+}
+
+async function submitBooking() {
+    const guest = {
+        full_name: document.getElementById("guestName").value,
+        email: document.getElementById("guestEmail").value,
+        phone: document.getElementById("guestPhone").value,
+        country: document.getElementById("guestCountry").value,
+        notes: document.getElementById("guestNotes").value
     };
 
-    try {
-      const res = await fetch(`${API_BASE}/api/book`, {
+    const res = await fetch("/api/book", {
         method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify(payload)
-      });
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            room_id: roomId,
+            room_name: roomId,
+            price_per_night: window.roomPrice,
+            guest,
+            checkin_date: checkin,
+            checkout_date: checkout
+        })
+    });
 
-      const data = await res.json();
+    const data = await res.json();
 
-      if (data.status === "success" && data.booking_id) {
-        location.href = `booking-confirmation.html?id=${encodeURIComponent(data.booking_id)}`;
-      } else {
-        alert(data.message || "Booking failed. Try again.");
-      }
-
-    } catch (err) {
-      alert("Unable to complete booking. Try again later.");
+    if (data.status === "success") {
+        window.location.href = `booking-confirmation.html?id=${data.booking_id}`;
+    } else {
+        alert("Booking failed.");
     }
-  });
-});
+}
+
+const today = new Date();
+const month = today.toISOString().slice(0, 7);
+loadCalendar(month);
 </script>
 
 </body>
