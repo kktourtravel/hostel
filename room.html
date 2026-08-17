@@ -92,147 +92,78 @@
 </footer>
 
 <script>
-const API_BASE = "https://hostelbackend1.onrender.com";
+const roomId = new URLSearchParams(window.location.search).get("room");
+let selectedCheckin = null;
+let selectedCheckout = null;
 
-const ROOM_DATA = {
-  "8bed": {
-    id: "8bed",
-    title: "8-Bed Mixed Dorm",
-    desc: "Comfortable bunk beds, lockers, shared bathroom.",
-    price: 45,
-    image: "NAV03661.jpg",
-    amenities: ["Wi-Fi","Lockers","Shared bathroom","Linen"]
-  },
-  "10bed": {
-    id: "10bed",
-    title: "10-Bed Mixed Dorm",
-    desc: "Mixed dorm with cozy atmosphere.",
-    price: 35,
-    image: "10-dorms-room-athens-hawks.jpg",
-    amenities: ["Wi-Fi","Lockers","Shared bathroom"]
-  },
-  "single": {
-    id: "single",
-    title: "Single Bed Room",
-    desc: "Perfect for solo travelers.",
-    price: 55,
-    image: "caption.jpg",
-    amenities: ["Wi-Fi","Private bed","Desk"]
-  },
-  "private": {
-    id: "private",
-    title: "Private Room",
-    desc: "Perfect for couples or solo travelers.",
-    price: 120,
-    image: "The-Eden-Tampines-Pasir-Ris-Tampines-Singapore.jpg",
-    amenities: ["Private bathroom","Wi-Fi","TV"]
-  }
-};
-
-function qs(name) {
-  const params = new URLSearchParams(location.search);
-  return params.get(name);
-}
-
-function formatBYN(n){ return `${n} BYN`; }
-
-function showRoom(roomId){
-  const r = ROOM_DATA[roomId] || ROOM_DATA["8bed"];
-  document.getElementById("roomTitle").innerText = r.title;
-  document.getElementById("roomDesc").innerText = r.desc;
-  document.getElementById("roomPrice").innerText = formatBYN(r.price);
-  document.getElementById("roomImage").src = r.image;
-
-  const ul = document.getElementById("amenitiesList");
-  ul.innerHTML = "";
-  r.amenities.forEach(a => {
-    const li = document.createElement("li");
-    li.innerText = a;
-    ul.appendChild(li);
-  });
-}
-
-// ⭐ BLOCK PAST DATES
-document.addEventListener("DOMContentLoaded", () => {
-  const today = new Date().toISOString().split("T")[0];
-  const checkinInput = document.getElementById("checkin");
-  const checkoutInput = document.getElementById("checkout");
-
-  checkinInput.setAttribute("min", today);
-  checkoutInput.setAttribute("min", today);
-
-  checkinInput.addEventListener("change", function () {
-    checkoutInput.setAttribute("min", this.value);
-  });
-
-  const roomId = qs("room") || "8bed";
-  showRoom(roomId);
-
-  document.getElementById("checkAvailabilityBtn").addEventListener("click", handleCheckClick);
-});
-
-async function checkAvailability(roomId, checkin, checkout){
-  const note = document.getElementById("availabilityNote");
-  note.innerText = "Checking availability...";
-
-  try {
-    const res = await fetch(`${API_BASE}/api/room/availability?room=${roomId}&checkin=${checkin}&checkout=${checkout}`);
+async function loadCalendar(month) {
+    const res = await fetch(`/api/room/calendar?room=${roomId}&month=${month}`);
     const data = await res.json();
 
-    if (data.available) {
-      note.innerHTML = `<strong>Available</strong> — ${formatBYN(ROOM_DATA[roomId].price)} per night`;
-      showSelectButton(roomId, checkin, checkout);
+    data.days.forEach(day => {
+        const el = document.querySelector(`[data-date="${day.date}"]`);
+        if (!el) return;
+
+        el.classList.remove("available-day", "disabled-day", "selected-day");
+
+        if (day.status === "available") {
+            el.classList.add("available-day");
+        } else {
+            el.classList.add("disabled-day");
+        }
+
+        el.onclick = () => selectDate(day.date, day.status);
+    });
+}
+
+function selectDate(date, status) {
+    if (status !== "available") return;
+
+    if (!selectedCheckin) {
+        selectedCheckin = date;
+    } else if (!selectedCheckout) {
+        if (date <= selectedCheckin) return;
+        selectedCheckout = date;
     } else {
-      note.innerHTML = `<strong>Not available</strong> — ${data.message || "Try different dates."}`;
-      showSoldOut();
+        selectedCheckin = date;
+        selectedCheckout = null;
     }
-  } catch (err) {
-    note.innerText = "Unable to check availability. Try again later.";
-    showSoldOut();
-  }
+
+    highlightSelection();
 }
 
-function showSelectButton(roomId, checkin, checkout){
-  const btn = document.getElementById("checkAvailabilityBtn");
-  btn.innerText = "Select";
-  btn.style.background = "var(--accent-gold)";
-  btn.onclick = () => {
-    location.href = `booking.html?room=${roomId}&checkin=${checkin}&checkout=${checkout}`;
-  };
+function highlightSelection() {
+    document.querySelectorAll(".calendar-day").forEach(el => {
+        el.classList.remove("selected-day");
+    });
 
-  document.getElementById("sendRequestBtn").style.display = "none";
+    if (!selectedCheckin) return;
+
+    const start = selectedCheckin;
+    const end = selectedCheckout || selectedCheckin;
+
+    document.querySelectorAll(".calendar-day").forEach(el => {
+        const d = el.dataset.date;
+        if (d >= start && d <= end) {
+            el.classList.add("selected-day");
+        }
+    });
 }
 
-function showSoldOut(){
-  const btn = document.getElementById("checkAvailabilityBtn");
-  btn.innerText = "Check Availability";
-  btn.style.background = "var(--primary-teal)";
-  btn.onclick = handleCheckClick;
+function goToBooking() {
+    if (!selectedCheckin || !selectedCheckout) {
+        alert("Please select check-in and check-out dates.");
+        return;
+    }
 
-  const reqBtn = document.getElementById("sendRequestBtn");
-  reqBtn.style.display = "inline-block";
-  reqBtn.onclick = () => {
-    alert("Request sent to hostel. We will contact you if a spot opens.");
-  };
+    window.location.href =
+        `booking.html?room=${roomId}&checkin=${selectedCheckin}&checkout=${selectedCheckout}`;
 }
 
-function handleCheckClick(){
-  const roomId = qs("room") || "8bed";
-  const checkin = document.getElementById("checkin").value;
-  const checkout = document.getElementById("checkout").value;
-
-  if (!checkin || !checkout) {
-    alert("Please select both check-in and check-out dates.");
-    return;
-  }
-
-  if (checkout <= checkin) {
-    alert("Checkout date must be after check-in date.");
-    return;
-  }
-
-  checkAvailability(roomId, checkin, checkout);
-}
+// Load current month
+const today = new Date();
+const month = today.toISOString().slice(0, 7);
+loadCalendar(month);
 </script>
 
 </body>
