@@ -1,110 +1,137 @@
 // controllers/bookingController.js
 
 const db = require("../config/db");
-const sendEmail = require("../utils/sendEmail");
-const calendarSync = require("../utils/calendarSync");
+const excelExport = require("../utils/excelExport");   // file exists
+const sendEmail = require("../utils/sendEmail");       // file exists
 
-// ======================================================
-// CHECK BED AVAILABILITY (for booking.html)
-// ======================================================
-exports.checkAvailability = (req, res) => {
-    const { checkin, checkout } = req.query;
-
-    if (!checkin || !checkout) {
-        return res.status(400).json({
-            error: "Missing parameters: checkin and checkout are required."
-        });
-    }
-
-    const sql = `
-        SELECT * FROM beds 
-        WHERE id NOT IN (
-            SELECT bed_id FROM bookings 
-            WHERE status = 'confirmed'
-            AND checkin_date < ?
-            AND checkout_date > ?
-
-            UNION
-
-            SELECT bed_id FROM blocked_beds
-            WHERE from_date < ?
-            AND to_date > ?
-        )
-    `;
-
-    db.query(sql, [checkout, checkin, checkout, checkin], (err, beds) => {
-        if (err) {
-            console.error("Availability DB error:", err);
-            return res.status(500).json({ error: "Database error while checking availability." });
-        }
-
-        return res.json({ available_beds: beds });
-    });
-};
-
-// ======================================================
+// ===============================
 // CREATE BOOKING
-// ======================================================
+// ===============================
 exports.createBooking = (req, res) => {
-    const { bed_id, guest, checkin_date, checkout_date } = req.body;
+    const {
+        room_id,
+        room_name,
+        price_per_night,
+        guest,
+        checkin_date,
+        checkout_date
+    } = req.body;
 
-    if (!bed_id || !guest || !checkin_date || !checkout_date) {
+    if (!room_id || !checkin_date || !checkout_date || !guest || !guest.full_name) {
         return res.status(400).json({
             status: "error",
             message: "Missing required fields."
         });
     }
 
+    // Calculate nights
+    const nights = Math.ceil(
+        (new Date(checkout_date) - new Date(checkin_date)) / (1000 * 60 * 60 * 24)
+    );
+
+    const total_price = nights * price_per_night;
+
     const sql = `
         INSERT INTO bookings 
-        (bed_id, guest_name, guest_email, guest_phone, country, checkin_date, checkout_date, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?, 'confirmed')
+        (room_code, room_name, guest_name, guest_email, guest_phone, country, notes, checkin_date, checkout_date, total_price, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'confirmed')
     `;
 
     db.query(
         sql,
         [
-            bed_id,
+            room_id,
+            room_name,
             guest.full_name,
             guest.email,
             guest.phone,
             guest.country,
+            guest.notes || "",
             checkin_date,
-            checkout_date
+            checkout_date,
+            total_price
         ],
-        async (err, result) => {
+        (err, result) => {
             if (err) {
                 console.error("Booking DB error:", err);
-                return res.status(500).json({ status: "error", message: "Database error while creating booking." });
+                return res.status(500).json({
+                    status: "error",
+                    message: "Database error while creating booking."
+                });
             }
 
             const booking_id = result.insertId;
 
-            // Send emails
+            // OPTIONAL: send email (safe, non-blocking)
             try {
-                await sendEmail.guestConfirmation(guest, booking_id);
-                await sendEmail.adminNotification(guest, booking_id);
+                sendEmail(
+                    guest.email,
+                    "Booking Confirmation",
+                    `Your booking is confirmed.\nBooking ID: ${booking_id}`
+                );
             } catch (emailErr) {
-                console.error("Email sending error:", emailErr);
-            }
-
-            // Sync calendar
-            try {
-                await calendarSync.addEvent({
-                    id: booking_id,
-                    bed_id,
-                    guest,
-                    checkin_date,
-                    checkout_date
-                });
-            } catch (calendarErr) {
-                console.error("Calendar sync error:", calendarErr);
+                console.log("Email sending failed (ignored):", emailErr);
             }
 
             return res.json({
                 status: "success",
-                booking_id
+                booking_id,
+                total_price
             });
         }
     );
+};
+
+// ===============================
+// GET ALL BOOKINGS (ADMIN)
+// ===============================
+exports.getBookings = (req, res) => {
+    const { from, to, room, status } = req.query;
+
+    let sql = "SELECT * FROM bookings WHERE 1=1";
+
+    if (from) sql += ` AND checkin_date >= '${from}'`;
+    if (to) sql += ` AND checkout_date <= '${to}'`;
+    if (room) sql += ` AND room_code = '${room}'`;
+    if (status) sql += ` AND status = '${status}'`;
+
+    db.query(sql, (err, rows) => {
+        if (err) {
+            console.error("Get bookings error:", err);
+            return res.status(500).json({ error: "Database error" });
+        }
+        res.json({ bookings: rows });
+    });
+};
+
+// ===============================
+// CANCEL BOOKING
+// ===============================
+exports.cancelBooking = (req, res) => {
+    const { booking_id } = req.body;
+
+    db.query(
+        "UPDATE bookings SET status='cancelled' WHERE id=?",
+        [booking_id],
+        (err) => {
+            if (err) {
+                console.error("Cancel booking error:", err);
+                return res.status(500).json({ error: "Database error" });
+            }
+            res.json({ status: "success" });
+        }
+    );
+};
+
+// ===============================
+// EXPORT BOOKINGS TO EXCEL
+// ===============================
+exports.exportExcel = async (req, res) => {
+    try {
+        const file = await excelExport.generate(req.query);
+        res.send(file);
+    } catch (err) {
+        console.error("Excel export error:", err);
+        res.status(500).json({ error: "Excel export failed" });
+    }
 };
