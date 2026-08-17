@@ -1,3 +1,5 @@
+// utils/sendEmail.js — FULLY FIXED & SAFE
+
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
@@ -10,8 +12,19 @@ const transporter = nodemailer.createTransport({
     }
 });
 
+// Safe wrapper to prevent backend crashes
+async function safeSend(options) {
+    try {
+        await transporter.sendMail(options);
+        console.log("📧 Email sent:", options.subject);
+    } catch (err) {
+        console.error("❌ Email sending failed:", err.message);
+        // Do NOT throw — backend must stay alive
+    }
+}
+
 exports.guestConfirmation = async (guest, booking_id) => {
-    await transporter.sendMail({
+    await safeSend({
         from: process.env.SMTP_EMAIL,
         to: guest.email,
         subject: `Booking Confirmed – ${booking_id}`,
@@ -20,7 +33,7 @@ exports.guestConfirmation = async (guest, booking_id) => {
 };
 
 exports.adminNotification = async (guest, booking_id) => {
-    await transporter.sendMail({
+    await safeSend({
         from: process.env.SMTP_EMAIL,
         to: process.env.ADMIN_EMAIL,
         subject: `New Booking – ${booking_id}`,
