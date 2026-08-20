@@ -14,8 +14,7 @@
     <nav>
       <a href="index.html">Home</a>
       <a href="rooms.html">Rooms</a>
-      <a href="booking.html">Booking</a>
-      <a href="admin.html">Admin</a>
+            <a href="admin.html">Admin</a>
       <a href="contact.html">Contact Us</a>
     </nav>
   </header>
@@ -32,7 +31,7 @@
     <div class="room-details-wrapper">
 
       <div class="room-image">
-        <img id="roomImage" src="10-dorms-room-athens-hawks.jpg" alt="Room Image">
+        <img id="roomImage" src="" alt="Room Image">
       </div>
 
       <div class="room-info">
@@ -105,55 +104,40 @@
     const API_BASE = "https://hostel-qhe0.onrender.com";
 
     // ===============================
-    // ROOM DATA (STATIC FOR NOW)
-    // ===============================
-    const roomData = {
-      1: {
-        name: "8-Bed Mixed Dorm",
-        image: "10-dorms-room-athens-hawks.jpg",
-        description: "Comfortable bunk beds, lockers, shared bathroom.",
-        price: 25
-      },
-      2: {
-        name: "Female Dorm",
-        image: "tw-story.jpg",
-        description: "Women-only dorm with cozy atmosphere.",
-        price: 28
-      },
-      3: {
-        name: "Private Room",
-        image: "The-Eden-Tampines-Pasir-Ris-Tampines.jpg",
-        description: "Perfect for couples or solo travelers.",
-        price: 55
-      }
-    };
-
-    // ===============================
-    // LOAD ROOM DETAILS
+    // READ URL PARAMETERS
     // ===============================
     const params = new URLSearchParams(window.location.search);
-    const roomId = params.get("room");
 
-    const room = roomData[roomId];
-
-    document.getElementById("roomTitle").innerText = room.name;
-    document.getElementById("roomName").innerText = room.name;
-    document.getElementById("roomDescription").innerText = room.description;
-    document.getElementById("roomImage").src = room.image;
-    document.getElementById("roomPrice").innerText = room.price;
+    const roomName = params.get("roomName");
+    const roomImage = params.get("roomImage");
+    const roomPrice = params.get("roomPrice");
+    const roomDescription = params.get("roomDescription");
 
     // ===============================
-    // DATE LOGIC (PERFECT CALENDAR)
+    // APPLY ROOM DETAILS
+    // ===============================
+    document.getElementById("roomTitle").innerText = roomName;
+    document.getElementById("roomName").innerText = roomName;
+    document.getElementById("roomDescription").innerText = roomDescription;
+    document.getElementById("roomImage").src = roomImage;
+    document.getElementById("roomPrice").innerText = roomPrice;
+
+    // ===============================
+    // PERFECT LOCAL DATE CALENDAR
     // ===============================
     const checkinInput = document.getElementById("checkin");
     const checkoutInput = document.getElementById("checkout");
 
     function setCalendarDefaults() {
-      const today = new Date();
-      const todayStr = today.toISOString().split("T")[0];
+      const now = new Date();
 
-      const tomorrow = new Date(today);
-      tomorrow.setDate(today.getDate() + 1);
+      // Local today
+      const todayStr = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+        .toISOString()
+        .split("T")[0];
+
+      // Local tomorrow
+      const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
       const tomorrowStr = tomorrow.toISOString().split("T")[0];
 
       checkinInput.value = todayStr;
@@ -165,6 +149,7 @@
 
     setCalendarDefaults();
 
+    // Auto-update checkout when check-in changes
     checkinInput.addEventListener("change", () => {
       const checkinDate = new Date(checkinInput.value);
 
@@ -211,7 +196,8 @@
           div.innerHTML = `
             <strong>${bed.bed_code}</strong><br>
             Room: ${bed.room_name}<br>
-            <button class="btn" onclick="window.location.href='booking.html?bed=${bed.bed_id}&room=${roomId}&checkin=${checkin}&checkout=${checkout}'">
+            <button class="btn"
+              onclick="window.location.href='booking.html?bed=${bed.bed_id}&roomName=${roomName}&roomImage=${roomImage}&roomPrice=${roomPrice}&checkin=${checkin}&checkout=${checkout}'">
               Book Now
             </button>
           `;
