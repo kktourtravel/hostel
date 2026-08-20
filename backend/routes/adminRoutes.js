@@ -1,21 +1,15 @@
 const express = require("express");
 const router = express.Router();
 const adminController = require("../controllers/adminController");
+const auth = require("../controllers/auth");
 
-// ===============================
-// Admin Routes
-// ===============================
+// LOGIN ROUTE
+router.post("/login", auth.adminLogin);
 
-// Get all bookings
+// Existing admin routes
 router.get("/bookings", adminController.getBookings);
-
-// Get all blocked dates
 router.get("/blocked-dates", adminController.getBlockedDates);
-
-// Block a date
 router.post("/block-date", adminController.blockDate);
-
-// Unblock a date
 router.delete("/unblock-date/:id", adminController.unblockDate);
 
 module.exports = router;
