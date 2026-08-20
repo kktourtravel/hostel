@@ -87,106 +87,36 @@
     © 2026 Hostel Name. All rights reserved.
   </div>
 </footer>
-
 <script>
 const API_BASE = "https://hostel-qhe0.onrender.com";
 
-const translations = {
-  en: {
-    page_title_admin: "Hostel Name – Admin",
-    logo_text: "Hostel Name",
-    nav_home: "Home",
-    nav_rooms: "Rooms",
-    nav_admin: "Admin",
-    nav_contact: "Contact Us",
-
-    admin_title: "Admin Login",
-    admin_email_label: "Email",
-    admin_password_label: "Password",
-    admin_login_btn: "Login",
-
-    footer_email: "info@hostelname.com",
-    footer_contact_heading: "CONTACT NUMBERS",
-    footer_addr1: "Storozhovskaya Street, 8",
-    footer_phone1: "+375 44 560-91-46",
-    footer_addr2: "46 Independence Avenue",
-    footer_phone2: "+375 29 322-60-91",
-    footer_addr3: "Berestynskaya 12, Building 1",
-    footer_phone3: "+375 44 533-33-15",
-    footer_bottom: "© 2026 Hostel Name. All rights reserved."
-  },
-
-  ru: {
-    page_title_admin: "Hostel Name – Админ",
-    logo_text: "Hostel Name",
-    nav_home: "Главная",
-    nav_rooms: "Комнаты",
-    nav_admin: "Админ",
-    nav_contact: "Контакты",
-
-    admin_title: "Вход администратора",
-    admin_email_label: "Email",
-    admin_password_label: "Пароль",
-    admin_login_btn: "Войти",
-
-    footer_email: "info@hostelname.com",
-    footer_contact_heading: "КОНТАКТНЫЕ НОМЕРА",
-    footer_addr1: "Улица Сторожовская, 8",
-    footer_phone1: "+375 44 560-91-46",
-    footer_addr2: "Проспект Независимости, 46",
-    footer_phone2: "+375 29 322-60-91",
-    footer_addr3: "Берестынская 12, корпус 1",
-    footer_phone3: "+375 44 533-33-15",
-    footer_bottom: "© 2026 Hostel Name. Все права защищены."
-  }
-};
-
-function applyTranslation(lang) {
-  document.querySelectorAll("[data-text]").forEach(el => {
-    const key = el.getAttribute("data-text");
-    if (translations[lang] && translations[lang][key]) {
-      el.innerText = translations[lang][key];
-    }
-  });
-}
-
-document.querySelectorAll('.lang-switch span').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.lang-switch span').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    applyTranslation(btn.dataset.lang);
-  });
-});
-
-// ⭐ ADMIN LOGIN FUNCTION
 document.getElementById("adminLoginBtn").addEventListener("click", async () => {
-  const email = document.getElementById("adminEmail").value.trim();
-  const password = document.getElementById("adminPassword").value.trim();
-  
-  if (!email || !password) {
-    alert("Please enter email and password.");
-    return;
-  }
+    const email = document.getElementById("adminEmail").value;
+    const password = document.getElementById("adminPassword").value;
 
-  try {
-    const res = await fetch(`${API_BASE}/api/admin/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password })
-    });
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+        });
 
-    const data = await res.json();
+        const data = await res.json();
 
-    if (data.status === "success") {
-      window.location.href = "admin-dashboard.html";
-    } else {
-      alert("Invalid email or password.");
+        if (data.status === "success") {
+            localStorage.setItem("isAdminLoggedIn", "true");
+            window.location.href = "adminDashboard.html";
+        } else {
+            alert("Login failed. Try again.");
+        }
+
+    } catch (err) {
+        console.error(err);
+        alert("Server error.");
     }
-  } catch (e) {
-    alert("Login failed. Try again.");
-  }
 });
 </script>
+
 
 </body>
 </html>
