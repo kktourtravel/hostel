@@ -114,7 +114,7 @@ async function loadBooking() {
   const container = document.getElementById("bookingDetails");
 
   try {
-    const res = await fetch(`${API_BASE}/api/admin/booking/${bookingId}`);
+    const res = await fetch(`${API_BASE}/api/booking/${bookingId}`);
     const data = await res.json();
 
     if (!data.booking) {
@@ -128,7 +128,7 @@ async function loadBooking() {
       (new Date(b.checkout_date) - new Date(b.checkin_date)) /
       (1000 * 60 * 60 * 24);
 
-    const total = nights * b.price_per_night;
+    const total = b.total_price || (nights * b.price_per_night);
 
     container.innerHTML = `
       <div class="confirm-row"><strong>Booking ID:</strong> <span>${b.id}</span></div>
@@ -142,7 +142,7 @@ async function loadBooking() {
       <div class="confirm-row"><strong>Total:</strong> <span>${total} BYN</span></div>
     `;
 
-    // QR Code (optional)
+    // QR Code
     document.getElementById("qrImage").src =
       `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=Booking-${b.id}`;
 
