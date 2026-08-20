@@ -1,4 +1,11 @@
-// Prevent selecting past dates
+// ===============================
+// API Base
+// ===============================
+const API_BASE = "https://hostel-qhe0.onrender.com";
+
+// ===============================
+// Date Inputs
+// ===============================
 const today = new Date().toISOString().split("T")[0];
 
 const checkinInput = document.getElementById("checkin");
@@ -14,11 +21,14 @@ checkinInput.addEventListener("change", function () {
     }
 });
 
-// API base
-const API_BASE = "https://hostel-qhe0.onrender.com";
+// ===============================
+// Global Selected Bed
+// ===============================
 let selectedBedId = null;
 
-// Load availability
+// ===============================
+// Check Availability
+// ===============================
 document.getElementById("checkAvailabilityBtn").addEventListener("click", async () => {
     const checkin = checkinInput.value;
     const checkout = checkoutInput.value;
@@ -57,7 +67,7 @@ document.getElementById("checkAvailabilityBtn").addEventListener("click", async 
 
             div.innerHTML = `
                 <strong>${bed.bed_code}</strong><br>
-                Room ID: ${bed.room_id}
+                Room: ${bed.room_name}
             `;
 
             div.onclick = () => {
@@ -75,7 +85,9 @@ document.getElementById("checkAvailabilityBtn").addEventListener("click", async 
     }
 });
 
-// Summary
+// ===============================
+// Update Summary
+// ===============================
 function updateSummary() {
     const checkin = checkinInput.value;
     const checkout = checkoutInput.value;
@@ -96,7 +108,9 @@ document.querySelectorAll(".booking-wrapper input").forEach(input => {
     input.addEventListener("input", updateSummary);
 });
 
-// Confirm booking
+// ===============================
+// Confirm Booking
+// ===============================
 document.getElementById("confirmBookingBtn").addEventListener("click", async () => {
     if (!selectedBedId) {
         alert("Please select a bed.");
