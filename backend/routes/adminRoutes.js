@@ -1,12 +1,18 @@
 const express = require("express");
 const router = express.Router();
+
+// Controllers
 const adminController = require("../controllers/adminController");
 const auth = require("../controllers/auth");
 
-// LOGIN ROUTE
+// ===============================
+// ADMIN LOGIN (SECURE)
+// ===============================
 router.post("/login", auth.adminLogin);
 
-// Existing admin routes
+// ===============================
+// ADMIN PANEL ROUTES
+// ===============================
 router.get("/bookings", adminController.getBookings);
 router.get("/blocked-dates", adminController.getBlockedDates);
 router.post("/block-date", adminController.blockDate);
