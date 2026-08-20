@@ -2,157 +2,118 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Booking Confirmation — Hostel Name</title>
-  <link rel="stylesheet" href="style.css?v=999">
-
-  <style>
-    .confirm-wrapper {
-      max-width: 900px;
-      margin: 40px auto;
-      background: var(--card-white);
-      padding: 24px;
-      border-radius: 12px;
-      border: 1px solid #C4DBD3;
-    }
-    .confirm-title {
-      font-size: 26px;
-      font-weight: 700;
-      margin-bottom: 12px;
-      color: var(--primary-teal);
-    }
-    .confirm-row {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 10px;
-      color: #4A6358;
-    }
-    .qr-box {
-      margin-top: 20px;
-      text-align: center;
-    }
-    .qr-box img {
-      width: 180px;
-      height: 180px;
-    }
-    .back-btn {
-      margin-top: 20px;
-      background: var(--primary-teal);
-      color: var(--light-ivory);
-      padding: 10px 16px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 700;
-      display: inline-block;
-    }
-  </style>
+  <title>Booking Confirmation</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<header>
-  <div class="logo">Hostel Name</div>
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="contact.html">Contact Us</a>
-  </nav>
-</header>
+  <header>
+    <div class="logo">Hostel Name</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="rooms.html">Rooms</a>
+      <a href="booking.html">Booking</a>
+      <a href="contact.html">Contact Us</a>
+    </nav>
+  </header>
 
-<section>
-  <div class="confirm-wrapper">
-    <h2 class="confirm-title">Booking Confirmed</h2>
+  <section class="hero" style="background-image: url('NAV03661.jpg'); background-size: cover; background-position: center;">
+    <h1>Booking Confirmed</h1>
+    <p>Your reservation has been successfully completed.</p>
+  </section>
 
-    <p style="color:#4A6358;margin-bottom:20px;">
-      Thank you for your reservation! Below are your booking details.
-    </p>
+  <section class="confirmation-section">
+    <div class="confirmation-card">
+      <h2>Your Booking Details</h2>
 
-    <div id="bookingDetails"></div>
+      <p><strong>Booking ID:</strong> <span id="bookingId">Loading...</span></p>
+      <p><strong>Guest:</strong> <span id="guestName">Loading...</span></p>
+      <p><strong>Room:</strong> <span id="roomName">Loading...</span></p>
+      <p><strong>Bed:</strong> <span id="bedCode">Loading...</span></p>
+      <p><strong>Check-in:</strong> <span id="checkinDate">Loading...</span></p>
+      <p><strong>Check-out:</strong> <span id="checkoutDate">Loading...</span></p>
+      <p><strong>Total Price:</strong> <span id="totalPrice">Loading...</span></p>
 
-    <div class="qr-box">
-      <h3>Your QR Code</h3>
-      <img id="qrImage" src="" alt="QR Code">
-      <p style="font-size:13px;color:#7A8B82;margin-top:8px;">
-        Scan this QR code at reception during check‑in.
-      </p>
+      <div class="confirmation-actions">
+        <a href="index.html" class="btn">Back to Home</a>
+        <a href="booking.html" class="btn">Make Another Booking</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer-structured">
+    <div class="footer-content">
+      <div class="footer-left">
+        <img src="footer-logo.png" alt="Hostel Logo" class="footer-logo">
+        <p class="footer-email">
+          <img src="email-icon.png" class="email-icon" alt="">
+          info@hostelname.com
+        </p>
+      </div>
+
+      <div class="footer-right">
+        <h3>CONTACT NUMBERS</h3>
+
+        <p>
+          <strong>Storozhovskaya Street, 8</strong><br>
+          +375 44 560-91-46
+        </p>
+
+        <p>
+          <strong>46 Independence Avenue</strong><br>
+          +375 29 322-60-91
+        </p>
+
+        <p>
+          <strong>Berestynskaya 12, Building 1</strong><br>
+          +375 44 533-33-15
+        </p>
+      </div>
     </div>
 
-    <a href="index.html" class="back-btn">Back to Home</a>
-  </div>
-</section>
-
-<footer class="footer-structured">
-  <div class="footer-content">
-    <div class="footer-left">
-      <img src="footer-logo.png" alt="Hostel Logo" class="footer-logo">
-      <p class="footer-email">
-        <img src="email-icon.png" class="email-icon">
-        info@hostelname.com
-      </p>
+    <div class="footer-bottom">
+      © 2026 Hostel Name. All rights reserved.
     </div>
+  </footer>
 
-    <div class="footer-right">
-      <h3>CONTACT NUMBERS</h3>
-      <p><strong>Storozhovskaya Street, 8</strong><br>+375 44 560-91-46</p>
-    </div>
-  </div>
+  <script>
+    const API_BASE = "https://hostel-qhe0.onrender.com";
 
-  <div class="footer-bottom">
-    © 2026 Hostel Name. All rights reserved.
-  </div>
-</footer>
+    // Get booking ID from URL
+    const params = new URLSearchParams(window.location.search);
+    const bookingId = params.get("id");
 
-<script>
-const API_BASE = "https://hostel-qhe0.onrender.com";
+    document.getElementById("bookingId").innerText = bookingId;
 
-// Get booking ID from URL
-const params = new URLSearchParams(window.location.search);
-const bookingId = params.get("id");
+    // Fetch booking details
+    async function loadBookingDetails() {
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/bookings`);
+        const data = await res.json();
 
-// Load booking details
-async function loadBooking() {
-  const container = document.getElementById("bookingDetails");
+        const booking = data.bookings.find(b => b.id == bookingId);
 
-  try {
-    const res = await fetch(`${API_BASE}/api/booking/${bookingId}`);
-    const data = await res.json();
+        if (!booking) {
+          alert("Booking not found.");
+          return;
+        }
 
-    if (!data.booking) {
-      container.innerHTML = "<p>Booking not found.</p>";
-      return;
+        document.getElementById("guestName").innerText = booking.guest_name;
+        document.getElementById("roomName").innerText = booking.room_name;
+        document.getElementById("bedCode").innerText = booking.bed_code || "-";
+        document.getElementById("checkinDate").innerText = booking.checkin_date;
+        document.getElementById("checkoutDate").innerText = booking.checkout_date;
+        document.getElementById("totalPrice").innerText = booking.total_price + " BYN";
+
+      } catch (err) {
+        console.error("Error loading booking:", err);
+        alert("Failed to load booking details.");
+      }
     }
 
-    const b = data.booking;
-
-    const nights =
-      (new Date(b.checkout_date) - new Date(b.checkin_date)) /
-      (1000 * 60 * 60 * 24);
-
-    const total = b.total_price || (nights * b.price_per_night);
-
-    container.innerHTML = `
-      <div class="confirm-row"><strong>Booking ID:</strong> <span>${b.id}</span></div>
-      <div class="confirm-row"><strong>Room:</strong> <span>${b.room_name}</span></div>
-      <div class="confirm-row"><strong>Guest:</strong> <span>${b.guest_name}</span></div>
-      <div class="confirm-row"><strong>Email:</strong> <span>${b.guest_email}</span></div>
-      <div class="confirm-row"><strong>Phone:</strong> <span>${b.guest_phone}</span></div>
-      <div class="confirm-row"><strong>Check‑in:</strong> <span>${b.checkin_date}</span></div>
-      <div class="confirm-row"><strong>Check‑out:</strong> <span>${b.checkout_date}</span></div>
-      <div class="confirm-row"><strong>Nights:</strong> <span>${nights}</span></div>
-      <div class="confirm-row"><strong>Total:</strong> <span>${total} BYN</span></div>
-    `;
-
-    // QR Code
-    document.getElementById("qrImage").src =
-      `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=Booking-${b.id}`;
-
-  } catch (err) {
-    container.innerHTML = "<p>Error loading booking.</p>";
-  }
-}
-
-loadBooking();
-</script>
+    loadBookingDetails();
+  </script>
 
 </body>
 </html>
