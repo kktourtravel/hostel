@@ -115,7 +115,7 @@
 </footer>
 
 <script>
-const API_BASE = "https://hostelbackend1.onrender.com";
+const API_BASE = "https://hostelqhe0.onrender.com";
 const roomId = new URLSearchParams(window.location.search).get("room");
 
 // Map rooms.html → room.html details
@@ -284,8 +284,8 @@ function setupActions() {
 
     try {
       const res = await fetch(
-        `${API_BASE}/api/availability?room=${roomId}&checkin=${checkin}&checkout=${checkout}&guests=${guests}`
-      );
+  `${API_BASE}/api/room/availability?room=${roomId}&checkin=${checkin}&checkout=${checkout}&guests=${guests}`
+);
       const data = await res.json();
 
       if (data.status === "available") {
