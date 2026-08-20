@@ -14,7 +14,7 @@
   <nav>
     <a href="index.html" data-text="nav_home">Home</a>
     <a href="rooms.html" data-text="nav_rooms">Rooms</a>
-    <a href="booking.html" data-text="nav_booking">Booking</a>
+    <!-- Booking removed from navigation -->
     <a href="admin.html" data-text="nav_admin">Admin</a>
     <a href="contact.html" data-text="nav_contact">Contact Us</a>
   </nav>
@@ -97,7 +97,6 @@ const translations = {
     logo_text: "Hostel Name",
     nav_home: "Home",
     nav_rooms: "Rooms",
-    nav_booking: "Booking",
     nav_admin: "Admin",
     nav_contact: "Contact Us",
 
@@ -122,7 +121,6 @@ const translations = {
     logo_text: "Hostel Name",
     nav_home: "Главная",
     nav_rooms: "Комнаты",
-    nav_booking: "Бронирование",
     nav_admin: "Админ",
     nav_contact: "Контакты",
 
@@ -166,7 +164,7 @@ document.getElementById("adminLoginBtn").addEventListener("click", async () => {
   const password = document.getElementById("adminPassword").value.trim();
   
   if (!email || !password) {
-   alert("Please enter email and password.");
+    alert("Please enter email and password.");
     return;
   }
 
@@ -180,9 +178,9 @@ document.getElementById("adminLoginBtn").addEventListener("click", async () => {
     const data = await res.json();
 
     if (data.status === "success") {
-            window.location.href = "admin-dashboard.html";
+      window.location.href = "admin-dashboard.html";
     } else {
-       alert("Invalid email or password.");
+      alert("Invalid email or password.");
     }
   } catch (e) {
     alert("Login failed. Try again.");
