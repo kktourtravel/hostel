@@ -2,25 +2,33 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 
-const app = express();          // ✅ MUST come before app.use()
+const app = express();
 
-app.use(cors());                // Enable CORS
-app.use(express.json());        // Parse JSON
+// ===============================
+// MIDDLEWARE
+// ===============================
+app.use(cors());          // Allow GitHub Pages → Render API
+app.use(express.json());  // Parse JSON bodies
 
-// Routes
+// ===============================
+// ROUTES
+// ===============================
 const bookingRoutes = require("./routes/bookingRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const roomRoutes = require("./routes/roomRoutes");
 
-// Room routes (availability, list, details)
+// Room routes (list, details, availability)
 app.use("/api/room", roomRoutes);
 
-// Public routes
+// Booking routes (availability + booking)
 app.use("/api", bookingRoutes);
 
-// Admin routes
+// Admin routes (login + dashboard actions)
 app.use("/api/admin", adminRoutes);
 
+// ===============================
+// SERVER START
+// ===============================
 app.listen(process.env.PORT || 3000, () => {
     console.log("Hostel backend running...");
 });
