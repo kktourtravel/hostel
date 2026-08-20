@@ -4,10 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title data-text="page_title_admin">Hostel Name – Admin</title>
-<link rel="stylesheet" href="style.css?v=999">
-
-
-
+  <link rel="stylesheet" href="style.css?v=999">
 </head>
 
 <body class="admin-body">
@@ -46,6 +43,8 @@
     </div>
 
     <button id="adminLoginBtn" data-text="admin_login_btn">Login</button>
+
+    <p id="adminLoginMessage" style="margin-top:12px;color:#b33;font-weight:600;"></p>
 
   </div>
 </section>
@@ -90,6 +89,8 @@
 </footer>
 
 <script>
+const API_BASE = "https://hostel-qhe0.onrender.com";
+
 const translations = {
   en: {
     page_title_admin: "Hostel Name – Admin",
@@ -157,6 +158,40 @@ document.querySelectorAll('.lang-switch span').forEach(btn => {
     btn.classList.add('active');
     applyTranslation(btn.dataset.lang);
   });
+});
+
+// ⭐ ADMIN LOGIN FUNCTION
+document.getElementById("adminLoginBtn").addEventListener("click", async () => {
+  const email = document.getElementById("adminEmail").value.trim();
+  const password = document.getElementById("adminPassword").value.trim();
+  const msg = document.getElementById("adminLoginMessage");
+
+  if (!email || !password) {
+    msg.innerText = "Please enter both email and password.";
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password })
+    });
+
+    const data = await res.json();
+
+    if (data.status === "success") {
+      msg.style.color = "green";
+      msg.innerText = "Login successful!";
+      window.location.href = "admin-dashboard.html";
+    } else {
+      msg.style.color = "#b33";
+      msg.innerText = "Invalid email or password.";
+    }
+  } catch (err) {
+    msg.style.color = "#b33";
+    msg.innerText = "Server error. Try again later.";
+  }
 });
 </script>
 
