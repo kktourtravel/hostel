@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>View Bookings — Hostel Admin</title>
+  <link rel="stylesheet" href="style.css?v=999">
+
+  <style>
+    .admin-section {
+      max-width: 1000px;
+      margin: 40px auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+    }
+    th {
+      background: #f5f5f5;
+      font-weight: 700;
+    }
+    .delete-btn {
+      background: #b33;
+      color: white;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">Hostel Name</div>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="rooms.html">Rooms</a>
+    <a href="booking.html">Booking</a>
+    <a href="admin.html">Admin</a>
+    <a href="admin-dashboard.html">Dashboard</a>
+  </nav>
+</header>
+
+<section class="admin-section">
+  <h2>All Bookings</h2>
+
+  <table id="bookingsTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Room</th>
+        <th>Guest</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Check-in</th>
+        <th>Check-out</th>
+        <th>Nights</th>
+        <th>Total</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</section>
+
+<script>
+const API_BASE = "https://hostel-qhe0.onrender.com";
+
+// ⭐ Load all bookings
+async function loadBookings() {
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/bookings`);
+    const data = await res.json();
+
+    const tbody = document.querySelector("#bookingsTable tbody");
+    tbody.innerHTML = "";
+
+    data.bookings.forEach(b => {
+      const nights =
+        (new Date(b.checkout_date) - new Date(b.checkin_date)) /
+        (1000 * 60 * 60 * 24);
+
+      const total = nights * b.price_per_night;
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${b.id}</td>
+        <td>${b.room_name}</td>
+        <td>${b.guest_name}</td>
+        <td>${b.guest_email}</td>
+        <td>${b.guest_phone}</td>
+        <td>${b.checkin_date}</td>
+        <td>${b.checkout_date}</td>
+        <td>${nights}</td>
+        <td>${total} BYN</td>
+        <td>
+          <button class="delete-btn" onclick="deleteBooking(${b.id})">Delete</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+  } catch (err) {
+    console.error("Failed to load bookings", err);
+    alert("Unable to load bookings.");
+  }
+}
+
+// ⭐ Delete booking
+async function deleteBooking(id) {
+  if (!confirm("Delete this booking?")) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/delete-booking/${id}`, {
+      method: "DELETE"
+    });
+
+    const data = await res.json();
+
+    if (data.status === "success") {
+      loadBookings();
+    } else {
+      alert("Failed to delete booking.");
+    }
+  } catch (err) {
+    alert("Server error.");
+  }
+}
+
+// ⭐ Init
+loadBookings();
+</script>
+
+</body>
+</html>
