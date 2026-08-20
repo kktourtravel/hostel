@@ -1,14 +1,21 @@
 const express = require("express");
 const router = express.Router();
+const adminController = require("../controllers/adminController");
 
-router.post("/login", (req, res) => {
-  const { email, password } = req.body;
+// ===============================
+// Admin Routes
+// ===============================
 
-  if (email === "crish2way@gmail.com" && password === "Avaparuhang@251") {
-    return res.json({ status: "success" });
-  }
+// Get all bookings
+router.get("/bookings", adminController.getBookings);
 
-  return res.json({ status: "fail", message: "Invalid credentials" });
-});
+// Get all blocked dates
+router.get("/blocked-dates", adminController.getBlockedDates);
+
+// Block a date
+router.post("/block-date", adminController.blockDate);
+
+// Unblock a date
+router.delete("/unblock-date/:id", adminController.unblockDate);
 
 module.exports = router;
