@@ -1,11 +1,10 @@
-const API_BASE = "https://hostelbackend1.onrender.com";
+const API_BASE = "https://hostel-qhe0.onrender.com";
 
 // Protect dashboard
 if (localStorage.getItem("isAdminLoggedIn") !== "true") {
     window.location.href = "admin.html";
 }
 
-// Load bookings
 async function loadBookings() {
     try {
         const res = await fetch(`${API_BASE}/api/admin/bookings`);
@@ -34,10 +33,8 @@ async function loadBookings() {
     }
 }
 
-// View booking (optional future feature)
 function viewBooking(id) {
     alert("Booking ID: " + id);
 }
 
-// Init
 loadBookings();
