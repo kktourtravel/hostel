@@ -146,34 +146,50 @@ async function loadCalendar(month) {
 
 // Submit booking
 async function submitBooking() {
-    const guest = {
-        full_name: document.getElementById("guestName").value,
-        email: document.getElementById("guestEmail").value,
-        phone: document.getElementById("guestPhone").value,
-        country: document.getElementById("guestCountry").value,
-        notes: document.getElementById("guestNotes").value
-    };
+  const guestName   = document.getElementById("guestName").value.trim();
+  const guestEmail  = document.getElementById("guestEmail").value.trim();
+  const guestPhone  = document.getElementById("guestPhone").value.trim();
+  const guestCountry= document.getElementById("guestCountry").value.trim();
+  const guestNotes  = document.getElementById("guestNotes").value.trim();
 
-    const res = await fetch(`${API_BASE}/api/book`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            room_id: roomId,
-            room_name: ROOM_CONFIG[roomId]?.title,
-            price_per_night: ROOM_CONFIG[roomId]?.price,
-            guest,
-            checkin_date: checkin,
-            checkout_date: checkout
-        })
-    });
+  if (!roomId || !checkin || !checkout) {
+    alert("Room and dates are missing. Please go back and select again.");
+    return;
+  }
 
-    const data = await res.json();
+  if (!guestName || !guestEmail || !guestPhone || !guestCountry) {
+    alert("Please fill in all required fields.");
+    return;
+  }
 
-    if (data.status === "success") {
-        window.location.href = `booking-confirmation.html?id=${data.booking_id}`;
-    } else {
-        alert("Booking failed.");
-    }
+  const guest = {
+    full_name: guestName,
+    email: guestEmail,
+    phone: guestPhone,
+    country: guestCountry,
+    notes: guestNotes
+  };
+
+  const res = await fetch("https://hostel-qhe0.onrender.com/api/book", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      room_id: roomId,
+      room_name: roomId,
+      price_per_night: window.roomPrice,
+      guest,
+      checkin_date: checkin,
+      checkout_date: checkout
+    })
+  });
+
+  const data = await res.json();
+
+  if (data.status === "success") {
+    window.location.href = `booking-confirmation.html?id=${data.booking_id}`;
+  } else {
+    alert("Booking failed.");
+  }
 }
 
 document.getElementById("bookNowBtn").addEventListener("click", submitBooking);
