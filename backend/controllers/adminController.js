@@ -5,33 +5,23 @@ const jwt = require("jsonwebtoken");
 const excelExport = require("../utils/excelExport");
 
 // ===============================
-// ADMIN LOGIN
+// ADMIN LOGIN (STATIC CREDENTIALS)
 // ===============================
 exports.login = (req, res) => {
     const { email, password } = req.body;
 
-    db.query(
-        "SELECT * FROM admins WHERE email=? AND password=?",
-        [email, password],
-        (err, rows) => {
-            if (err) {
-                console.error("Admin login DB error:", err);
-                return res.status(500).json({ error: "Database error" });
-            }
+    // FIXED: Use your provided credentials
+    if (email === "crish2way@gmail.com" && password === "Avaparuhang@251") {
+        return res.json({
+            status: "success",
+            message: "Login successful"
+        });
+    }
 
-            if (rows.length === 0) {
-                return res.json({ error: "Invalid credentials" });
-            }
-
-            const token = jwt.sign(
-                { id: rows[0].id },
-                process.env.JWT_SECRET,
-                { expiresIn: "7d" }
-            );
-
-            res.json({ token });
-        }
-    );
+    return res.json({
+        status: "fail",
+        message: "Invalid credentials"
+    });
 };
 
 // ===============================
