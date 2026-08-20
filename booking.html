@@ -119,7 +119,7 @@ const roomId = params.get("room");
 let checkin = params.get("checkin");
 let checkout = params.get("checkout");
 
-// ROOM CONFIG (same as room.html)
+// ROOM CONFIG
 const ROOM_CONFIG = {
   "8bed": { title: "8-Bed Mixed Dorm", price: 45 },
   "10bed": { title: "10-Bed Mixed Dorm", price: 35 },
@@ -136,13 +136,6 @@ document.getElementById("summaryPrice").innerText = ROOM_CONFIG[roomId]?.price +
 const nights = (new Date(checkout) - new Date(checkin)) / (1000 * 60 * 60 * 24);
 document.getElementById("summaryNights").innerText = nights;
 document.getElementById("summaryTotal").innerText = (ROOM_CONFIG[roomId]?.price * nights) + " BYN";
-
-// Load calendar
-async function loadCalendar(month) {
-    const res = await fetch(`${API_BASE}/api/room/calendar?room=${roomId}&month=${month}`);
-    const data = await res.json();
-    console.log("Calendar:", data);
-}
 
 // Submit booking
 async function submitBooking() {
@@ -170,13 +163,13 @@ async function submitBooking() {
     notes: guestNotes
   };
 
-  const res = await fetch("https://hostel-qhe0.onrender.com/api/book", {
+  const res = await fetch(`${API_BASE}/api/book`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       room_id: roomId,
-      room_name: roomId,
-      price_per_night: window.roomPrice,
+      room_name: ROOM_CONFIG[roomId]?.title,
+      price_per_night: ROOM_CONFIG[roomId]?.price,
       guest,
       checkin_date: checkin,
       checkout_date: checkout
@@ -193,10 +186,6 @@ async function submitBooking() {
 }
 
 document.getElementById("bookNowBtn").addEventListener("click", submitBooking);
-
-const today = new Date();
-const month = today.toISOString().slice(0, 7);
-loadCalendar(month);
 </script>
 
 </body>
