@@ -115,79 +115,39 @@
 </footer>
 
 <script>
+const API_BASE = "https://hostel-qhe0.onrender.com";
+
 const params = new URLSearchParams(window.location.search);
 const roomId = params.get("room");
 let checkin = params.get("checkin");
 let checkout = params.get("checkout");
 
+// ROOM CONFIG (same as room.html)
+const ROOM_CONFIG = {
+  "8bed": { title: "8-Bed Mixed Dorm", price: 45 },
+  "10bed": { title: "10-Bed Mixed Dorm", price: 35 },
+  "single": { title: "Single Bed Room", price: 55 },
+  "private": { title: "Private Room", price: 120 }
+};
+
+// Fill summary
+document.getElementById("roomName").value = ROOM_CONFIG[roomId]?.title || "Room";
+document.getElementById("summaryRoom").innerText = ROOM_CONFIG[roomId]?.title || "Room";
+document.getElementById("summaryDates").innerText = `${checkin} → ${checkout}`;
+document.getElementById("summaryPrice").innerText = ROOM_CONFIG[roomId]?.price + " BYN";
+
+const nights = (new Date(checkout) - new Date(checkin)) / (1000 * 60 * 60 * 24);
+document.getElementById("summaryNights").innerText = nights;
+document.getElementById("summaryTotal").innerText = (ROOM_CONFIG[roomId]?.price * nights) + " BYN";
+
+// Load calendar
 async function loadCalendar(month) {
-    const res = await fetch(`/api/room/calendar?room=${roomId}&month=${month}`);
+    const res = await fetch(`${API_BASE}/api/room/calendar?room=${roomId}&month=${month}`);
     const data = await res.json();
-
-    data.days.forEach(day => {
-        const el = document.querySelector(`[data-date="${day.date}"]`);
-        if (!el) return;
-
-        el.classList.remove("available-day", "disabled-day", "selected-day");
-
-        if (day.status === "available") {
-            el.classList.add("available-day");
-        } else {
-            el.classList.add("disabled-day");
-        }
-
-        el.onclick = () => selectDate(day.date, day.status);
-    });
-
-    highlightSelection();
+    console.log("Calendar:", data);
 }
 
-function selectDate(date, status) {
-    if (status !== "available") return;
-
-    if (!checkin) {
-        checkin = date;
-    } else if (!checkout) {
-        if (date <= checkin) return;
-        checkout = date;
-    } else {
-        checkin = date;
-        checkout = null;
-    }
-
-    highlightSelection();
-    updateSummary();
-}
-
-function highlightSelection() {
-    document.querySelectorAll(".calendar-day").forEach(el => {
-        el.classList.remove("selected-day");
-    });
-
-    if (!checkin) return;
-
-    const start = checkin;
-    const end = checkout || checkin;
-
-    document.querySelectorAll(".calendar-day").forEach(el => {
-        const d = el.dataset.date;
-        if (d >= start && d <= end) {
-            el.classList.add("selected-day");
-        }
-    });
-}
-
-function updateSummary() {
-    if (!checkin || !checkout) return;
-
-    const nights =
-        (new Date(checkout) - new Date(checkin)) / (1000 * 60 * 60 * 24);
-
-    document.getElementById("summaryCheckin").innerText = checkin;
-    document.getElementById("summaryCheckout").innerText = checkout;
-    document.getElementById("summaryNights").innerText = nights;
-}
-
+// Submit booking
 async function submitBooking() {
     const guest = {
         full_name: document.getElementById("guestName").value,
@@ -197,13 +157,13 @@ async function submitBooking() {
         notes: document.getElementById("guestNotes").value
     };
 
-    const res = await fetch("/api/book", {
+    const res = await fetch(`${API_BASE}/api/book`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             room_id: roomId,
-            room_name: roomId,
-            price_per_night: window.roomPrice,
+            room_name: ROOM_CONFIG[roomId]?.title,
+            price_per_night: ROOM_CONFIG[roomId]?.price,
             guest,
             checkin_date: checkin,
             checkout_date: checkout
@@ -218,6 +178,8 @@ async function submitBooking() {
         alert("Booking failed.");
     }
 }
+
+document.getElementById("bookNowBtn").addEventListener("click", submitBooking);
 
 const today = new Date();
 const month = today.toISOString().slice(0, 7);
