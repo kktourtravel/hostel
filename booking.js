@@ -1,6 +1,4 @@
-// ===============================
 // Prevent selecting past dates
-// ===============================
 const today = new Date().toISOString().split("T")[0];
 
 const checkinInput = document.getElementById("checkin");
@@ -9,7 +7,6 @@ const checkoutInput = document.getElementById("checkout");
 checkinInput.setAttribute("min", today);
 checkoutInput.setAttribute("min", today);
 
-// Ensure checkout is always >= checkin
 checkinInput.addEventListener("change", function () {
     checkoutInput.setAttribute("min", this.value);
     if (checkoutInput.value < this.value) {
@@ -17,17 +14,11 @@ checkinInput.addEventListener("change", function () {
     }
 });
 
-
-// ===============================
-// API Base
-// ===============================
-const API_BASE = "https://hostelbackend1.onrender.com";
+// API base
+const API_BASE = "https://hostel-qhe0.onrender.com";
 let selectedBedId = null;
 
-
-// ===============================
-// Load Availability
-// ===============================
+// Load availability
 document.getElementById("checkAvailabilityBtn").addEventListener("click", async () => {
     const checkin = checkinInput.value;
     const checkout = checkoutInput.value;
@@ -37,7 +28,6 @@ document.getElementById("checkAvailabilityBtn").addEventListener("click", async 
         return;
     }
 
-    // Extra validation
     if (checkout < checkin) {
         alert("Checkout date cannot be earlier than check-in.");
         return;
@@ -85,10 +75,7 @@ document.getElementById("checkAvailabilityBtn").addEventListener("click", async 
     }
 });
 
-
-// ===============================
-// Update Summary
-// ===============================
+// Summary
 function updateSummary() {
     const checkin = checkinInput.value;
     const checkout = checkoutInput.value;
@@ -109,10 +96,7 @@ document.querySelectorAll(".booking-wrapper input").forEach(input => {
     input.addEventListener("input", updateSummary);
 });
 
-
-// ===============================
-// Confirm Booking
-// ===============================
+// Confirm booking
 document.getElementById("confirmBookingBtn").addEventListener("click", async () => {
     if (!selectedBedId) {
         alert("Please select a bed.");
