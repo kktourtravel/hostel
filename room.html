@@ -173,8 +173,11 @@ function applyRoomDetails() {
 async function loadCalendar() {
   try {
     const today = new Date();
-    const month = today.toISOString().slice(0, 7);
-    const res = await fetch(`${API_BASE}/api/room/calendar?room=${roomId}&month=${month}`);
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const monthStr = `${year}-${month}`;
+    
+    const res = await fetch(`${API_BASE}/api/room/calendar?room=${roomId}&month=${monthStr}`);
     const data = await res.json();
 
     calendarDays = {};
@@ -189,10 +192,12 @@ async function loadCalendar() {
 }
 
 function isDateAvailable(dateStr) {
-  if (calendarDays[dateStr] && calendarDays[dateStr] !== "available") {
-    return false;
+  // If date not in calendar, assume available
+  if (!calendarDays[dateStr]) {
+    return true;
   }
-  return true;
+  // Only unavailable if explicitly marked as such
+  return calendarDays[dateStr] === "available";
 }
 
 function toYMD(d) {
@@ -202,21 +207,29 @@ function toYMD(d) {
   return `${y}-${m}-${day}`;
 }
 
+function getLocalToday() {
+  const today = new Date();
+  return toYMD(today);
+}
+
+function getTomorrow(dateStr) {
+  const date = new Date(dateStr + "T00:00:00");
+  date.setDate(date.getDate() + 1);
+  return toYMD(date);
+}
+
 function setupDateInputs() {
   const checkinInput = document.getElementById("checkin");
   const checkoutInput = document.getElementById("checkout");
 
-  const today = new Date();
-  const todayStr = toYMD(today);
+  const todayStr = getLocalToday();
+  const tomorrowStr = getTomorrow(todayStr);
 
-  const tomorrow = new Date(today);
-  tomorrow.setDate(today.getDate() + 1);
-  const tomorrowStr = toYMD(tomorrow);
-
+  // Set min dates and default values
   checkinInput.min = todayStr;
-  checkoutInput.min = tomorrowStr;
-
   checkinInput.value = todayStr;
+
+  checkoutInput.min = tomorrowStr;
   checkoutInput.value = tomorrowStr;
 
   checkinInput.addEventListener("change", function () {
@@ -225,17 +238,16 @@ function setupDateInputs() {
 
     if (!isDateAvailable(val)) {
       alert("Selected check‑in date is not available.");
-      this.value = "";
+      this.value = todayStr;
       return;
     }
 
-    const nextDay = new Date(val);
-    nextDay.setDate(nextDay.getDate() + 1);
-    const nextDayStr = toYMD(nextDay);
-
+    const nextDayStr = getTomorrow(val);
     checkoutInput.min = nextDayStr;
+    
+    // Reset checkout if it's before the new minimum
     if (checkoutInput.value < nextDayStr) {
-      checkoutInput.value = "";
+      checkoutInput.value = nextDayStr;
     }
   });
 
@@ -245,7 +257,7 @@ function setupDateInputs() {
 
     if (!isDateAvailable(val)) {
       alert("Selected check‑out date is not available.");
-      this.value = "";
+      this.value = getTomorrow(checkinInput.value);
       return;
     }
   });
@@ -266,9 +278,8 @@ function setupActions() {
       return;
     }
 
-    if (!isDateAvailable(checkin) || !isDateAvailable(checkout)) {
-      note.innerText = "Selected dates are not available.";
-      sendRequestBtn.style.display = "inline-block";
+    if (new Date(checkout) <= new Date(checkin)) {
+      alert("Check-out date must be after check-in date.");
       return;
     }
 
@@ -279,18 +290,22 @@ function setupActions() {
       const data = await res.json();
 
       if (data.available === true) {
-        note.innerText = "Room is available for selected dates.";
+        note.innerText = "✓ Room is available for selected dates.";
         sendRequestBtn.style.display = "none";
 
-        window.location.href =
-          `booking.html?room=${roomId}&checkin=${checkin}&checkout=${checkout}&guests=${guests}`;
+        // Redirect to booking page
+        setTimeout(() => {
+          window.location.href =
+            `booking.html?room=${roomId}&checkin=${checkin}&checkout=${checkout}&guests=${guests}`;
+        }, 500);
       } else {
-        note.innerText = "Room is not available for selected dates.";
+        note.innerText = "✗ Room is not available for selected dates.";
         sendRequestBtn.style.display = "inline-block";
       }
     } catch (e) {
       console.error("Availability check failed", e);
       note.innerText = "Unable to check availability. Try again later.";
+      sendRequestBtn.style.display = "inline-block";
     }
   });
 
