@@ -3,187 +3,182 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title data-text="contact_title">Contact Us – Hostel Name</title>
+  <title data-text="page_title">Hostel Name – Contact</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<header>
-  <div class="logo" data-text="logo_text">Hostel Name</div>
-  <nav>
-    <a href="index.html" data-text="nav_home">Home</a>
-    <a href="rooms.html" data-text="nav_rooms">Rooms</a>
-    <a href="admin.html" data-text="nav_admin">Admin</a>
-    <a href="contact.html" data-text="nav_contact">Contact Us</a>
-  </nav>
+  <header>
+    <div class="logo" data-text="logo_text">Hostel Name</div>
+    <nav>
+      <a href="index.html" data-text="nav_home">Home</a>
+      <a href="rooms.html" data-text="nav_rooms">Rooms</a>
+      <a href="booking.html" data-text="nav_booking">Booking</a>
+      <a href="admin.html" data-text="nav_admin">Admin</a>
+      <a href="contact.html" data-text="nav_contact">Contact Us</a>
+    </nav>
+    <div class="lang-switch">
+      <span data-lang="en" class="active">EN</span>
+      <span data-lang="ru">RU</span>
+    </div>
+  </header>
 
-  <div class="lang-switch">
-    <span data-lang="en" class="active">EN</span>
-    <span data-lang="ru">RU</span>
-  </div>
-</header>
+  <section class="hero" style="background-image: url('NAV03661.jpg'); background-size: cover; background-position: center;">
+    <h1 data-text="contact_hero_title">Contact Us</h1>
+    <p data-text="contact_hero_sub">We’re here to help with your stay, bookings, and questions.</p>
+  </section>
 
-<section class="contact-section">
-  <h2 data-text="contact_heading">Contact Us</h2>
-  <p class="section-intro" data-text="contact_intro">
-    We’re here to help! Reach out to us using the details below.
-  </p>
+  <section>
+    <h2 data-text="contact_title">Get in Touch</h2>
+    <p class="section-intro" data-text="contact_intro">Reach us by phone, email, or the form below.</p>
 
-  <div class="contact-grid">
+    <div class="rooms-grid">
+      <div class="room-card">
+        <div class="room-card-body">
+          <h3 data-text="contact_phone_title">Phone</h3>
+          <p>
+            <span data-text="footer_phone1">+375 44 560-91-46</span><br>
+            <span data-text="footer_phone2">+375 29 322-60-91</span><br>
+            <span data-text="footer_phone3">+375 44 533-33-15</span>
+          </p>
+        </div>
+      </div>
 
-    <!-- LEFT SIDE: CONTACT INFO -->
-    <div class="contact-info">
-      <h3 data-text="contact_details_title">Contact Details</h3>
+      <div class="room-card">
+        <div class="room-card-body">
+          <h3 data-text="contact_email_title">Email</h3>
+          <p data-text="footer_email">info@hostelname.com</p>
+        </div>
+      </div>
 
-      <p>
-        <strong data-text="footer_addr1">Storozhovskaya Street, 8</strong><br>
-        <span data-text="footer_phone1">+375 44 560-91-46</span>
-      </p>
+      <div class="room-card">
+        <div class="room-card-body">
+          <h3 data-text="contact_form_title">Send a Message</h3>
+          <form class="booking-wrapper">
+            <input type="text" placeholder="Your Name" />
+            <input type="email" placeholder="Your Email" />
+            <input type="text" placeholder="Subject" />
+            <textarea placeholder="Message" style="width:100%; padding:10px; margin-top:10px;"></textarea>
+            <button type="button" style="margin-top:10px;">Send (static)</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
 
-      <p>
-        <strong data-text="footer_addr2">46 Independence Avenue</strong><br>
-        <span data-text="footer_phone2">+375 29 322-60-91</span>
-      </p>
+  <footer class="footer-structured">
+    <div class="footer-content">
+      <div class="footer-left">
+        <img src="footer-logo.png" alt="Hostel Logo" class="footer-logo">
+        <p class="footer-email">
+          <img src="email-icon.png" class="email-icon" alt="">
+          <span data-text="footer_email">info@hostelname.com</span>
+        </p>
+      </div>
 
-      <p>
-        <strong data-text="footer_addr3">Berestynskaya 12, Building 1</strong><br>
-        <span data-text="footer_phone3">+375 44 533-33-15</span>
-      </p>
+      <div class="footer-right">
+        <h3 data-text="footer_contact_heading">CONTACT NUMBERS</h3>
 
-      <p class="email-line">
-        <img src="email-icon.png" class="email-icon" alt="">
-        <span data-text="footer_email">info@hostelname.com</span>
-      </p>
+        <p>
+          <strong data-text="footer_addr1">Storozhovskaya Street, 8</strong><br>
+          <span data-text="footer_phone1">+375 44 560-91-46</span>
+        </p>
+
+        <p>
+          <strong data-text="footer_addr2">46 Independence Avenue</strong><br>
+          <span data-text="footer_phone2">+375 29 322-60-91</span>
+        </p>
+
+        <p>
+          <strong data-text="footer_addr3">Berestynskaya 12, Building 1</strong><br>
+          <span data-text="footer_phone3">+375 44 533-33-15</span>
+        </p>
+      </div>
     </div>
 
-    <!-- RIGHT SIDE: MAP -->
-    <div class="contact-map">
-      <h3 data-text="contact_map_title">Our Location</h3>
-      <iframe src="https://maps.google.com/maps?q=minsk&output=embed"></iframe>
+    <div class="footer-bottom" data-text="footer_bottom">
+      © 2026 Hostel Name. All rights reserved.
     </div>
+  </footer>
 
-  </div>
-</section>
+  <script>
+    const translations = {
+      en: {
+        page_title: "Hostel Name – Contact",
+        logo_text: "Hostel Name",
+        nav_home: "Home",
+        nav_rooms: "Rooms",
+        nav_booking: "Booking",
+        nav_admin: "Admin",
+        nav_contact: "Contact Us",
 
-<footer class="footer-structured">
-  <div class="footer-content">
+        contact_hero_title: "Contact Us",
+        contact_hero_sub: "We’re here to help with your stay, bookings, and questions.",
+        contact_title: "Get in Touch",
+        contact_intro: "Reach us by phone, email, or the form below.",
+        contact_phone_title: "Phone",
+        contact_email_title: "Email",
+        contact_form_title: "Send a Message",
 
-    <div class="footer-left">
-      <img src="footer-logo.png" alt="Hostel Logo" class="footer-logo">
-      <p class="footer-email">
-        <img src="email-icon.png" class="email-icon" alt="">
-        <span data-text="footer_email">info@hostelname.com</span>
-      </p>
-    </div>
+        footer_email: "info@hostelname.com",
+        footer_contact_heading: "CONTACT NUMBERS",
+        footer_addr1: "Storozhovskaya Street, 8",
+        footer_phone1: "+375 44 560-91-46",
+        footer_addr2: "46 Independence Avenue",
+        footer_phone2: "+375 29 322-60-91",
+        footer_addr3: "Berestynskaya 12, Building 1",
+        footer_phone3: "+375 44 533-33-15",
+        footer_bottom: "© 2026 Hostel Name. All rights reserved."
+      },
+      ru: {
+        page_title: "Hostel Name – Контакты",
+        logo_text: "Hostel Name",
+        nav_home: "Главная",
+        nav_rooms: "Комнаты",
+        nav_booking: "Бронирование",
+        nav_admin: "Админ",
+        nav_contact: "Контакты",
 
-    <div class="footer-right">
-      <h3 data-text="footer_contact_heading">CONTACT NUMBERS</h3>
+        contact_hero_title: "Свяжитесь с нами",
+        contact_hero_sub: "Мы помогаем с проживанием, бронированиями и вопросами.",
+        contact_title: "Связаться",
+        contact_intro: "Свяжитесь с нами по телефону, email или через форму.",
+        contact_phone_title: "Телефон",
+        contact_email_title: "Email",
+        contact_form_title: "Отправить сообщение",
 
-      <p>
-        <strong data-text="footer_addr1">Storozhovskaya Street, 8</strong><br>
-        <span data-text="footer_phone1">+375 44 560-91-46</span>
-      </p>
-
-      <p>
-        <strong data-text="footer_addr2">46 Independence Avenue</strong><br>
-        <span data-text="footer_phone2">+375 29 322-60-91</span>
-      </p>
-
-      <p>
-        <strong data-text="footer_addr3">Berestynskaya 12, Building 1</strong><br>
-        <span data-text="footer_phone3">+375 44 533-33-15</span>
-      </p>
-    </div>
-
-  </div>
-
-  <div class="footer-bottom" data-text="footer_bottom">
-    © 2026 Hostel Name. All rights reserved.
-  </div>
-</footer>
-
-<!-- ⭐ TRANSLATION SCRIPT -->
-<script>
-  const translations = {
-    en: {
-      contact_title: "Contact Us – Hostel Name",
-      contact_heading: "Contact Us",
-      contact_intro: "We’re here to help! Reach out to us using the details below.",
-      contact_details_title: "Contact Details",
-      contact_map_title: "Our Location",
-
-      // Footer + shared text
-      logo_text: "Hostel Name",
-      nav_home: "Home",
-      nav_rooms: "Rooms",
-      nav_admin: "Admin",
-      nav_contact: "Contact Us",
-
-      footer_email: "info@hostelname.com",
-      footer_contact_heading: "CONTACT NUMBERS",
-
-      footer_addr1: "Storozhovskaya Street, 8",
-      footer_phone1: "+375 44 560-91-46",
-
-      footer_addr2: "46 Independence Avenue",
-      footer_phone2: "+375 29 322-60-91",
-
-      footer_addr3: "Berestynskaya 12, Building 1",
-      footer_phone3: "+375 44 533-33-15",
-
-      footer_bottom: "© 2026 Hostel Name. All rights reserved."
-    },
-
-    ru: {
-      contact_title: "Контакты – Hostel Name",
-      contact_heading: "Свяжитесь с нами",
-      contact_intro: "Мы всегда готовы помочь! Свяжитесь с нами по указанным данным.",
-      contact_details_title: "Контактные данные",
-      contact_map_title: "Наше местоположение",
-
-      // Footer + shared text
-      logo_text: "Hostel Name",
-      nav_home: "Главная",
-      nav_rooms: "Комнаты",
-      nav_admin: "Админ",
-      nav_contact: "Контакты",
-
-      footer_email: "info@hostelname.com",
-      footer_contact_heading: "КОНТАКТНЫЕ НОМЕРА",
-
-      footer_addr1: "Улица Сторожовская, 8",
-      footer_phone1: "+375 44 560-91-46",
-
-      footer_addr2: "Проспект Независимости, 46",
-      footer_phone2: "+375 29 322-60-91",
-
-      footer_addr3: "Берестынская 12, корпус 1",
-      footer_phone3: "+375 44 533-33-15",
-
-      footer_bottom: "© 2026 Hostel Name. Все права защищены."
-    }
-  };
-
-  function applyTranslation(lang) {
-    document.querySelectorAll("[data-text]").forEach(el => {
-      const key = el.getAttribute("data-text");
-      if (translations[lang] && translations[lang][key]) {
-        el.innerText = translations[lang][key];
+        footer_email: "info@hostelname.com",
+        footer_contact_heading: "КОНТАКТНЫЕ НОМЕРА",
+        footer_addr1: "Улица Сторожовская, 8",
+        footer_phone1: "+375 44 560-91-46",
+        footer_addr2: "Проспект Независимости, 46",
+        footer_phone2: "+375 29 322-60-91",
+        footer_addr3: "Берестынская 12, корпус 1",
+        footer_phone3: "+375 44 533-33-15",
+        footer_bottom: "© 2026 Hostel Name. Все права защищены."
       }
-    });
-    if (translations[lang] && translations[lang].contact_title) {
-      document.title = translations[lang].contact_title;
-    }
-  }
+    };
 
-  document.querySelectorAll('.lang-switch span').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.lang-switch span').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      applyTranslation(btn.dataset.lang);
+    function applyTranslation(lang) {
+      document.querySelectorAll("[data-text]").forEach(el => {
+        const key = el.getAttribute("data-text");
+        if (translations[lang] && translations[lang][key]) {
+          el.innerText = translations[lang][key];
+        }
+      });
+      if (translations[lang] && translations[lang].page_title) {
+        document.title = translations[lang].page_title;
+      }
+    }
+
+    document.querySelectorAll('.lang-switch span').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.lang-switch span').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        applyTranslation(btn.dataset.lang);
+      });
     });
-  });
-</script>
+  </script>
 
 </body>
 </html>
