@@ -1,20 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Booking Confirmed — Hostel Name</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Booking Confirmation — Hostel Name</title>
+  <link rel="stylesheet" href="style.css?v=999">
+
   <style>
-    .confirm-card { max-width:900px;margin:40px auto;padding:20px;border-radius:10px;background:var(--card-white);border:1px solid #C4DBD3;display:flex;gap:20px;align-items:flex-start; }
-    .qr { width:200px;height:200px;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;border:1px solid #E2ECE9; }
-    .actions { display:flex;gap:10px;margin-top:12px;flex-wrap:wrap; }
-    .actions a, .actions button { padding:10px 14px;border-radius:8px;border:none;cursor:pointer;font-weight:700;text-decoration:none; }
-    .download { background:var(--primary-teal); color:var(--light-ivory); }
-    .whatsapp { background:#25D366; color:#fff; }
-    .email { background:#126346; color:#fff; }
+    .confirm-wrapper {
+      max-width: 900px;
+      margin: 40px auto;
+      background: var(--card-white);
+      padding: 24px;
+      border-radius: 12px;
+      border: 1px solid #C4DBD3;
+    }
+    .confirm-title {
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--primary-teal);
+    }
+    .confirm-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      color: #4A6358;
+    }
+    .qr-box {
+      margin-top: 20px;
+      text-align: center;
+    }
+    .qr-box img {
+      width: 180px;
+      height: 180px;
+    }
+    .back-btn {
+      margin-top: 20px;
+      background: var(--primary-teal);
+      color: var(--light-ivory);
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+      display: inline-block;
+    }
   </style>
 </head>
+
 <body>
 
 <header>
@@ -29,32 +63,24 @@
 </header>
 
 <section>
-  <div id="content" style="max-width:1100px;margin:40px auto;">
-    <div class="confirm-card">
-      <div style="flex:1;">
-        <h2>Your booking has been confirmed</h2>
-        <p id="bookingNumber" style="font-weight:800;color:var(--primary-teal);"></p>
-        <div id="bookingDetails" style="color:#4A6358;margin-top:8px;"></div>
+  <div class="confirm-wrapper">
+    <h2 class="confirm-title">Booking Confirmed</h2>
 
-        <div class="actions">
-          <a id="downloadBtn" class="download" href="#" download>Download PDF</a>
-          <button id="printBtn">Print</button>
-          <a id="whatsappBtn" class="whatsapp" href="#" target="_blank">Send via WhatsApp</a>
-          <a id="emailBtn" class="email" href="#">Send via Email</a>
-        </div>
+    <p style="color:#4A6358;margin-bottom:20px;">
+      Thank you for your reservation! Below are your booking details.
+    </p>
 
-        <div style="margin-top:18px;">
-          <button id="manageBtn" style="background:var(--accent-gold);color:var(--primary-teal);padding:10px 14px;border-radius:8px;border:none;font-weight:700;">Manage booking</button>
-        </div>
-      </div>
+    <div id="bookingDetails"></div>
 
-      <div style="width:220px;text-align:center;">
-        <div class="qr" id="qrWrap">
-          <img id="qrImg" src="" alt="QR code" style="max-width:100%;max-height:100%;">
-        </div>
-        <p style="font-size:13px;color:#7A8B82;margin-top:8px;">Scan to view booking</p>
-      </div>
+    <div class="qr-box">
+      <h3>Your QR Code</h3>
+      <img id="qrImage" src="" alt="QR Code">
+      <p style="font-size:13px;color:#7A8B82;margin-top:8px;">
+        Scan this QR code at reception during check‑in.
+      </p>
     </div>
+
+    <a href="index.html" class="back-btn">Back to Home</a>
   </div>
 </section>
 
@@ -62,99 +88,73 @@
   <div class="footer-content">
     <div class="footer-left">
       <img src="footer-logo.png" alt="Hostel Logo" class="footer-logo">
-      <p class="footer-email"><img src="email-icon.png" class="email-icon">info@hostelname.com</p>
+      <p class="footer-email">
+        <img src="email-icon.png" class="email-icon">
+        info@hostelname.com
+      </p>
     </div>
+
     <div class="footer-right">
       <h3>CONTACT NUMBERS</h3>
       <p><strong>Storozhovskaya Street, 8</strong><br>+375 44 560-91-46</p>
     </div>
   </div>
-  <div class="footer-bottom">© 2026 Hostel Name. All rights reserved.</div>
+
+  <div class="footer-bottom">
+    © 2026 Hostel Name. All rights reserved.
+  </div>
 </footer>
 
 <script>
-const API_BASE = "https://hostelbackend1.onrender.com";
+const API_BASE = "https://hostel-qhe0.onrender.com";
 
-function qs(name){ return new URLSearchParams(location.search).get(name); }
+// Get booking ID from URL
+const params = new URLSearchParams(window.location.search);
+const bookingId = params.get("id");
 
-async function fetchBooking(id){
+// Load booking details
+async function loadBooking() {
+  const container = document.getElementById("bookingDetails");
+
   try {
-    const res = await fetch(`${API_BASE}/api/booking/${encodeURIComponent(id)}`);
-    return await res.json();
-  } catch(e){
-    return null;
+    const res = await fetch(`${API_BASE}/api/admin/booking/${bookingId}`);
+    const data = await res.json();
+
+    if (!data.booking) {
+      container.innerHTML = "<p>Booking not found.</p>";
+      return;
+    }
+
+    const b = data.booking;
+
+    const nights =
+      (new Date(b.checkout_date) - new Date(b.checkin_date)) /
+      (1000 * 60 * 60 * 24);
+
+    const total = nights * b.price_per_night;
+
+    container.innerHTML = `
+      <div class="confirm-row"><strong>Booking ID:</strong> <span>${b.id}</span></div>
+      <div class="confirm-row"><strong>Room:</strong> <span>${b.room_name}</span></div>
+      <div class="confirm-row"><strong>Guest:</strong> <span>${b.guest_name}</span></div>
+      <div class="confirm-row"><strong>Email:</strong> <span>${b.guest_email}</span></div>
+      <div class="confirm-row"><strong>Phone:</strong> <span>${b.guest_phone}</span></div>
+      <div class="confirm-row"><strong>Check‑in:</strong> <span>${b.checkin_date}</span></div>
+      <div class="confirm-row"><strong>Check‑out:</strong> <span>${b.checkout_date}</span></div>
+      <div class="confirm-row"><strong>Nights:</strong> <span>${nights}</span></div>
+      <div class="confirm-row"><strong>Total:</strong> <span>${total} BYN</span></div>
+    `;
+
+    // QR Code (optional)
+    document.getElementById("qrImage").src =
+      `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=Booking-${b.id}`;
+
+  } catch (err) {
+    container.innerHTML = "<p>Error loading booking.</p>";
   }
 }
 
-function generateQR(data){
-  const payload = encodeURIComponent(data);
-  return `https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=${payload}`;
-}
-
-document.addEventListener("DOMContentLoaded", async () => {
-  const id = qs("id");
-  const bookingNumberEl = document.getElementById("bookingNumber");
-  const detailsEl = document.getElementById("bookingDetails");
-  const qrImg = document.getElementById("qrImg");
-  const whatsappBtn = document.getElementById("whatsappBtn");
-  const emailBtn = document.getElementById("emailBtn");
-  const downloadBtn = document.getElementById("downloadBtn");
-  const printBtn = document.getElementById("printBtn");
-  const manageBtn = document.getElementById("manageBtn");
-
-  if (!id) {
-    bookingNumberEl.innerText = "Booking ID not found";
-    detailsEl.innerText = "If you were redirected here, please contact support.";
-    return;
-  }
-
-  const data = await fetchBooking(id);
-  let bookingData = data && data.status === "success" ? data.booking : null;
-
-  if (!bookingData) {
-    bookingData = {
-      id,
-      room_name: "Room",
-      checkin_date: "",
-      checkout_date: "",
-      guest: { full_name:"", email:"", phone:"", country:"" },
-      total_price: ""
-    };
-  }
-
-  bookingNumberEl.innerText = bookingData.id || id;
-
-  detailsEl.innerHTML = `
-    <div><strong>Guest:</strong> ${bookingData.guest.full_name || "-"}</div>
-    <div><strong>Room:</strong> ${bookingData.room_name || "-"}</div>
-    <div><strong>Dates:</strong> ${bookingData.checkin_date || "-"} — ${bookingData.checkout_date || "-"}</div>
-    <div><strong>Total:</strong> ${bookingData.total_price || "-"}</div>
-  `;
-
-  const qrData = `Booking:${bookingData.id};Guest:${bookingData.guest.full_name};Room:${bookingData.room_name};Dates:${bookingData.checkin_date}-${bookingData.checkout_date};Total:${bookingData.total_price}`;
-  qrImg.src = generateQR(qrData);
-
-  const waText = encodeURIComponent(
-    `Booking confirmed: ${bookingData.id}\nGuest: ${bookingData.guest.full_name}\nRoom: ${bookingData.room_name}\nDates: ${bookingData.checkin_date} — ${bookingData.checkout_date}\nTotal: ${bookingData.total_price}`
-  );
-  whatsappBtn.href = `https://wa.me/?text=${waText}`;
-
-  const mailBody = encodeURIComponent(
-    `Your booking is confirmed.\n\nBooking ID: ${bookingData.id}\nGuest: ${bookingData.guest.full_name}\nRoom: ${bookingData.room_name}\nDates: ${bookingData.checkin_date} — ${bookingData.checkout_date}\nTotal: ${bookingData.total_price}\n\nThank you.`
-  );
-  emailBtn.href = `mailto:?subject=${encodeURIComponent("Booking confirmation")}&body=${mailBody}`;
-
-  downloadBtn.addEventListener("click", () => {
-    const printUrl = `booking-confirmation-print.html?id=${encodeURIComponent(id)}`;
-    window.open(printUrl, "_blank");
-  });
-
-  printBtn.addEventListener("click", () => window.print());
-
-  manageBtn.addEventListener("click", () => {
-    location.href = `manage-booking.html?id=${encodeURIComponent(id)}`;
-  });
-});
+loadBooking();
 </script>
 
 </body>
