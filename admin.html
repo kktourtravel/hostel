@@ -164,10 +164,9 @@ document.querySelectorAll('.lang-switch span').forEach(btn => {
 document.getElementById("adminLoginBtn").addEventListener("click", async () => {
   const email = document.getElementById("adminEmail").value.trim();
   const password = document.getElementById("adminPassword").value.trim();
-  const msg = document.getElementById("adminLoginMessage");
-
+  
   if (!email || !password) {
-    msg.innerText = "Please enter both email and password.";
+   alert("Please enter email and password.");
     return;
   }
 
@@ -181,16 +180,12 @@ document.getElementById("adminLoginBtn").addEventListener("click", async () => {
     const data = await res.json();
 
     if (data.status === "success") {
-      msg.style.color = "green";
-      msg.innerText = "Login successful!";
-      window.location.href = "admin-dashboard.html";
+            window.location.href = "admin-dashboard.html";
     } else {
-      msg.style.color = "#b33";
-      msg.innerText = "Invalid email or password.";
+       alert("Invalid email or password.");
     }
-  } catch (err) {
-    msg.style.color = "#b33";
-    msg.innerText = "Server error. Try again later.";
+  } catch (e) {
+    alert("Login failed. Try again.");
   }
 });
 </script>
