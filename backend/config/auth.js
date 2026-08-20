@@ -1,13 +1,13 @@
-const jwt = require("jsonwebtoken");
+exports.adminLogin = (req, res) => {
+    const { email, password } = req.body;
 
-module.exports = function (req, res, next) {
-    const token = req.headers.authorization?.split(" ")[1];
-    if (!token) return res.status(401).json({ error: "Unauthorized" });
+    // SIMPLE HARDCODED ADMIN LOGIN
+    const ADMIN_EMAIL = "crish2way@gmail.com";
+    const ADMIN_PASS = "Avaparuhang@251";
 
-    try {
-        req.admin = jwt.verify(token, process.env.JWT_SECRET);
-        next();
-    } catch {
-        res.status(401).json({ error: "Invalid token" });
+    if (email === ADMIN_EMAIL && password === ADMIN_PASS) {
+        return res.json({ status: "success" });
     }
+
+    return res.json({ status: "error", message: "Invalid credentials" });
 };
