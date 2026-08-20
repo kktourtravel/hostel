@@ -1,9 +1,8 @@
 exports.adminLogin = (req, res) => {
     const { email, password } = req.body;
 
-    // SIMPLE HARDCODED ADMIN LOGIN
-    const ADMIN_EMAIL = "crish2way@gmail.com";
-    const ADMIN_PASS = "Avaparuhang@251";
+    const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
+    const ADMIN_PASS = process.env.ADMIN_PASS;
 
     if (email === ADMIN_EMAIL && password === ADMIN_PASS) {
         return res.json({ status: "success" });
