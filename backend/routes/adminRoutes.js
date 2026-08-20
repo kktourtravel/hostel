@@ -1,13 +1,14 @@
 const express = require("express");
 const router = express.Router();
-const adminController = require("../controllers/adminController");
-const auth = require("../config/auth");
 
-router.post("/login", adminController.login);
-router.get("/bookings", auth, adminController.getBookings);
-router.post("/bookings/add", auth, adminController.addBooking);
-router.post("/bookings/cancel", auth, adminController.cancelBooking);
-router.post("/block", auth, adminController.blockBed);
-router.get("/export/excel", auth, adminController.exportExcel);
+router.post("/login", (req, res) => {
+  const { email, password } = req.body;
+
+  if (email === "crish2way@gmail.com" && password === "Avaparuhang@251") {
+    return res.json({ status: "success" });
+  }
+
+  return res.json({ status: "fail", message: "Invalid credentials" });
+});
 
 module.exports = router;
