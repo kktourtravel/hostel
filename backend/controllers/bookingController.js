@@ -1,6 +1,5 @@
 const db = require("../config/db");
 const sendEmail = require("../utils/sendEmail");
-const calendarSync = require("../utils/calendarSync");
 
 // ===============================
 // CHECK AVAILABILITY
@@ -142,9 +141,6 @@ exports.createBooking = async (req, res) => {
             subject: "Booking Confirmation",
             text: `Your booking is confirmed. Booking ID: ${bookingId}`
         });
-
-        // 5. Calendar sync (placeholder)
-        calendarSync.addEvent({ id: bookingId });
 
         res.json({
             status: "success",
