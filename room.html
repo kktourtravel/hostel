@@ -43,7 +43,7 @@
   <nav>
     <a href="index.html">Home</a>
     <a href="rooms.html">Rooms</a>
-    <a href="booking.html">Booking</a>
+    <!-- Booking removed from navigation -->
     <a href="admin.html">Admin</a>
     <a href="contact.html">Contact Us</a>
   </nav>
@@ -115,7 +115,7 @@
 </footer>
 
 <script>
-const API_BASE = "https://hostelqhe0.onrender.com";
+const API_BASE = "https://hostel-qhe0.onrender.com";  // FIXED
 const roomId = new URLSearchParams(window.location.search).get("room");
 
 // Map rooms.html → room.html details
@@ -150,9 +150,8 @@ const ROOM_CONFIG = {
   }
 };
 
-let calendarDays = {}; // { "2026-08-18": "available" | "unavailable" | ... }
+let calendarDays = {}; 
 
-// Apply room details
 function applyRoomDetails() {
   const cfg = ROOM_CONFIG[roomId];
   if (!cfg) return;
@@ -171,18 +170,17 @@ function applyRoomDetails() {
   });
 }
 
-// Load calendar availability for current month
 async function loadCalendar() {
   try {
     const today = new Date();
-    const month = today.toISOString().slice(0, 7); // YYYY-MM
+    const month = today.toISOString().slice(0, 7);
     const res = await fetch(`${API_BASE}/api/room/calendar?room=${roomId}&month=${month}`);
     const data = await res.json();
 
     calendarDays = {};
     if (data.days && Array.isArray(data.days)) {
       data.days.forEach(day => {
-        calendarDays[day.date] = day.status; // date: "2026-08-18", status: "available" / "unavailable"
+        calendarDays[day.date] = day.status;
       });
     }
   } catch (e) {
@@ -191,14 +189,12 @@ async function loadCalendar() {
 }
 
 function isDateAvailable(dateStr) {
-  // If backend marks it as unavailable, block it
   if (calendarDays[dateStr] && calendarDays[dateStr] !== "available") {
     return false;
   }
   return true;
 }
 
-// Prevent past dates
 function toYMD(d) {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, "0");
@@ -210,20 +206,16 @@ function setupDateInputs() {
   const checkinInput = document.getElementById("checkin");
   const checkoutInput = document.getElementById("checkout");
 
-  // Today (local)
   const today = new Date();
   const todayStr = toYMD(today);
 
-  // Tomorrow (local)
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
   const tomorrowStr = toYMD(tomorrow);
 
-  // Block past dates
   checkinInput.min = todayStr;
   checkoutInput.min = tomorrowStr;
 
-  // Auto‑fill initial values
   checkinInput.value = todayStr;
   checkoutInput.value = tomorrowStr;
 
@@ -259,7 +251,6 @@ function setupDateInputs() {
   });
 }
 
-// Check availability and either go to booking or show request
 function setupActions() {
   const checkBtn = document.getElementById("checkAvailabilityBtn");
   const sendRequestBtn = document.getElementById("sendRequestBtn");
@@ -275,24 +266,22 @@ function setupActions() {
       return;
     }
 
-    // Final guard: if any selected date is marked unavailable, block
     if (!isDateAvailable(checkin) || !isDateAvailable(checkout)) {
-      note.innerText = "Selected dates are not available. Please choose different dates.";
+      note.innerText = "Selected dates are not available.";
       sendRequestBtn.style.display = "inline-block";
       return;
     }
 
     try {
       const res = await fetch(
-  `${API_BASE}/api/room/availability?room=${roomId}&checkin=${checkin}&checkout=${checkout}&guests=${guests}`
-);
+        `${API_BASE}/api/room/availability?room=${roomId}&checkin=${checkin}&checkout=${checkout}&guests=${guests}`
+      );
       const data = await res.json();
 
-      if (data.status === "available") {
+      if (data.available === true) {
         note.innerText = "Room is available for selected dates.";
         sendRequestBtn.style.display = "none";
 
-        // Go to booking page with prefilled params
         window.location.href =
           `booking.html?room=${roomId}&checkin=${checkin}&checkout=${checkout}&guests=${guests}`;
       } else {
@@ -310,7 +299,6 @@ function setupActions() {
   });
 }
 
-// Init
 (async function initRoomPage() {
   applyRoomDetails();
   await loadCalendar();
