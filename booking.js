@@ -6,13 +6,15 @@ const today = new Date().toISOString().split("T")[0];
 const checkinInput = document.getElementById("checkin");
 const checkoutInput = document.getElementById("checkout");
 
-// Minimum date = today
 checkinInput.setAttribute("min", today);
 checkoutInput.setAttribute("min", today);
 
-// When user selects check-in, update checkout minimum
+// Ensure checkout is always >= checkin
 checkinInput.addEventListener("change", function () {
     checkoutInput.setAttribute("min", this.value);
+    if (checkoutInput.value < this.value) {
+        checkoutInput.value = this.value;
+    }
 });
 
 
@@ -35,11 +37,19 @@ document.getElementById("checkAvailabilityBtn").addEventListener("click", async 
         return;
     }
 
+    // Extra validation
+    if (checkout < checkin) {
+        alert("Checkout date cannot be earlier than check-in.");
+        return;
+    }
+
+    const container = document.getElementById("bedsContainer");
+    container.innerHTML = "<p>Loading...</p>";
+
     try {
         const res = await fetch(`${API_BASE}/api/availability?checkin=${checkin}&checkout=${checkout}`);
         const data = await res.json();
 
-        const container = document.getElementById("bedsContainer");
         container.innerHTML = "";
 
         if (!data.available_beds || data.available_beds.length === 0) {
@@ -63,6 +73,7 @@ document.getElementById("checkAvailabilityBtn").addEventListener("click", async 
             div.onclick = () => {
                 selectedBedId = bed.bed_id;
                 document.getElementById("summaryBed").innerText = `Selected Bed: ${bed.bed_code}`;
+                updateSummary();
             };
 
             container.appendChild(div);
@@ -108,21 +119,31 @@ document.getElementById("confirmBookingBtn").addEventListener("click", async () 
         return;
     }
 
+    const guestName = document.getElementById("guestName").value;
+    const guestEmail = document.getElementById("guestEmail").value;
+    const guestPhone = document.getElementById("guestPhone").value;
+    const guestCountry = document.getElementById("guestCountry").value;
+
+    if (!guestName || !guestEmail || !guestPhone || !guestCountry) {
+        alert("Please fill all guest details.");
+        return;
+    }
+
     const payload = {
         bed_id: selectedBedId,
         guest: {
-            full_name: document.getElementById("guestName").value,
-            email: document.getElementById("guestEmail").value,
-            phone: document.getElementById("guestPhone").value,
-            country: document.getElementById("guestCountry").value
+            full_name: guestName,
+            email: guestEmail,
+            phone: guestPhone,
+            country: guestCountry
         },
         checkin_date: checkinInput.value,
         checkout_date: checkoutInput.value
     };
 
     try {
-        const res = await fetch('https://hostel-qhe0.onrender.com/api/book', {
-  method: 'POST',
+        const res = await fetch(`${API_BASE}/api/book`, {
+            method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
         });
@@ -133,7 +154,7 @@ document.getElementById("confirmBookingBtn").addEventListener("click", async () 
             alert("Booking confirmed!");
             window.location.href = `booking-confirmation.html?id=${data.booking_id}`;
         } else {
-            alert("Booking failed.");
+            alert(data.message || "Booking failed.");
         }
 
     } catch (err) {
