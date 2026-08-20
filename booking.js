@@ -121,8 +121,8 @@ document.getElementById("confirmBookingBtn").addEventListener("click", async () 
     };
 
     try {
-        const res = await fetch(`${API_BASE}/api/book`, {
-            method: "POST",
+        const res = await fetch('https://hostel-qhe0.onrender.com/api/book', {
+  method: 'POST',
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
         });
