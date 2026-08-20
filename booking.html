@@ -1,192 +1,213 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Booking — Hostel Name</title>
-  <link rel="stylesheet" href="style.css" />
-  <style>
-    .summary-box { padding:16px; border-radius:8px; border:1px solid #C4DBD3; background:var(--card-white); }
-    .summary-row { display:flex; justify-content:space-between; margin-bottom:8px; color:#4A6358; }
-    #bookNowBtn {
-      background:var(--primary-teal);
-      color:var(--light-ivory);
-      padding:10px 16px;
-      border:none;
-      border-radius:8px;
-      cursor:pointer;
-      font-weight:700;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <title>Complete Your Booking</title>
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<header>
-  <div class="logo">Hostel Name</div>
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="contact.html">Contact Us</a>
-  </nav>
-</header>
+  <!-- HEADER -->
+  <header>
+    <div class="logo">Hostel Name</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="rooms.html">Rooms</a>
+      <a href="booking.html">Booking</a>
+      <a href="admin.html">Admin</a>
+      <a href="contact.html">Contact Us</a>
+    </nav>
+  </header>
 
-<section>
-  <h2>Booking Form</h2>
-  <p class="section-intro">Fill in your details to reserve your stay.</p>
+  <!-- HERO -->
+  <section class="hero" style="background-image: url('NAV03661.jpg');">
+    <h1>Complete Your Booking</h1>
+    <p>Fill in your details to confirm your stay</p>
+  </section>
 
-  <div style="display:flex;gap:24px;max-width:1000px;margin:20px auto;flex-wrap:wrap;">
-    <div style="flex:1;min-width:320px;">
-      <div class="booking-wrapper">
-        <div class="booking-group">
-          <label>Room</label>
-          <input type="text" id="roomName" readonly>
-        </div>
+  <!-- BOOKING SECTION -->
+  <section class="booking-wrapper">
 
-        <div class="booking-group">
-          <label>Check-in Date</label>
-          <input type="date" id="checkin">
-        </div>
+    <div class="booking-left">
 
-        <div class="booking-group">
-          <label>Check-out Date</label>
-          <input type="date" id="checkout">
-        </div>
+      <h2>Your Stay</h2>
 
-        <div class="booking-group">
-          <label>Full Name</label>
-          <input type="text" id="guestName">
-        </div>
+      <p><strong>Room:</strong> <span id="roomName">Loading...</span></p>
+      <p><strong>Bed:</strong> <span id="bedCode">Loading...</span></p>
 
-        <div class="booking-group">
-          <label>Email</label>
-          <input type="email" id="guestEmail">
-        </div>
+      <label>Check-in:</label>
+      <input type="date" id="checkin">
 
-        <div class="booking-group">
-          <label>Phone</label>
-          <input type="text" id="guestPhone">
-        </div>
+      <label>Check-out:</label>
+      <input type="date" id="checkout">
 
-        <div class="booking-group">
-          <label>Country</label>
-          <input type="text" id="guestCountry">
-        </div>
+      <h3>Guest Information</h3>
 
-        <div class="booking-group">
-          <label>Additional notes</label>
-          <textarea id="guestNotes" rows="3" style="width:100%;padding:10px;border-radius:6px;border:1px solid #A3C4B8;background:var(--light-ivory);"></textarea>
-        </div>
+      <label>Full Name:</label>
+      <input type="text" id="guestName" placeholder="Your full name">
 
-        <div style="margin-top:12px;">
-          <button id="bookNowBtn">Book</button>
-        </div>
+      <label>Email:</label>
+      <input type="email" id="guestEmail" placeholder="Your email">
+
+      <label>Phone:</label>
+      <input type="text" id="guestPhone" placeholder="Your phone number">
+
+      <label>Country:</label>
+      <input type="text" id="guestCountry" placeholder="Your country">
+
+      <button id="confirmBookingBtn" class="btn">Confirm Booking</button>
+
+    </div>
+
+    <div class="booking-right">
+
+      <h2>Booking Summary</h2>
+
+      <p id="summaryBed">Selected Bed: Loading...</p>
+      <p id="summaryDates">Dates: Loading...</p>
+      <p id="summaryGuest">Guest: Loading...</p>
+
+    </div>
+
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer-structured">
+    <div class="footer-content">
+
+      <div class="footer-left">
+        <img src="footer-logo.png" alt="Hostel Logo" class="footer-logo">
+        <p class="footer-email">
+          <img src="email-icon.png" class="email-icon" alt="">
+          info@hostelname.com
+        </p>
       </div>
-    </div>
 
-    <div style="width:320px;">
-      <div class="summary-box">
-        <h3>My booking</h3>
-        <div class="summary-row"><div>Room</div><div id="summaryRoom">—</div></div>
-        <div class="summary-row"><div>Dates</div><div id="summaryDates">—</div></div>
-        <div class="summary-row"><div>Nights</div><div id="summaryNights">—</div></div>
-        <div class="summary-row"><div>Price / night</div><div id="summaryPrice">—</div></div>
-        <hr style="border:none;border-top:1px solid #E2ECE9;margin:12px 0;">
-        <div class="summary-row"><strong>Total</strong><strong id="summaryTotal">—</strong></div>
-        <p style="font-size:13px;color:#7A8B82;margin-top:10px;">No prepayment required. Free cancellation until 24 hours before check-in.</p>
+      <div class="footer-right">
+        <h3>CONTACT NUMBERS</h3>
+
+        <p>
+          <strong>Storozhovskaya Street, 8</strong><br>
+          +375 44 560-91-46
+        </p>
+
+        <p>
+          <strong>46 Independence Avenue</strong><br>
+          +375 29 322-60-91
+        </p>
+
+        <p>
+          <strong>Berestynskaya 12, Building 1</strong><br>
+          +375 44 533-33-15
+        </p>
       </div>
+
     </div>
-  </div>
-</section>
 
-<footer class="footer-structured">
-  <div class="footer-content">
-    <div class="footer-left">
-      <img src="footer-logo.png" alt="Hostel Logo" class="footer-logo">
-      <p class="footer-email"><img src="email-icon.png" class="email-icon">info@hostelname.com</p>
+    <div class="footer-bottom">
+      © 2026 Hostel Name. All rights reserved.
     </div>
-    <div class="footer-right">
-      <h3>CONTACT NUMBERS</h3>
-      <p><strong>Storozhovskaya Street, 8</strong><br>+375 44 560-91-46</p>
-    </div>
-  </div>
-  <div class="footer-bottom">© 2026 Hostel Name. All rights reserved.</div>
-</footer>
+  </footer>
 
-<script>
-const API_BASE = "https://hostel-qhe0.onrender.com";
+  <!-- BOOKING LOGIC -->
+  <script src="booking.js"></script>
 
-const params = new URLSearchParams(window.location.search);
-const roomId = params.get("room");
-let checkin = params.get("checkin");
-let checkout = params.get("checkout");
+  <script>
+    // ===============================
+    // READ URL PARAMETERS
+    // ===============================
+    const params = new URLSearchParams(window.location.search);
 
-// ROOM CONFIG
-const ROOM_CONFIG = {
-  "8bed": { title: "8-Bed Mixed Dorm", price: 45 },
-  "10bed": { title: "10-Bed Mixed Dorm", price: 35 },
-  "single": { title: "Single Bed Room", price: 55 },
-  "private": { title: "Private Room", price: 120 }
-};
+    const bedId = params.get("bed");
+    const roomId = params.get("room");
+    const checkinParam = params.get("checkin");
+    const checkoutParam = params.get("checkout");
 
-// Fill summary
-document.getElementById("roomName").value = ROOM_CONFIG[roomId]?.title || "Room";
-document.getElementById("summaryRoom").innerText = ROOM_CONFIG[roomId]?.title || "Room";
-document.getElementById("summaryDates").innerText = `${checkin} → ${checkout}`;
-document.getElementById("summaryPrice").innerText = ROOM_CONFIG[roomId]?.price + " BYN";
+    // ===============================
+    // ROOM DATA (same as room.html)
+    // ===============================
+    const roomData = {
+      1: { name: "8-Bed Mixed Dorm" },
+      2: { name: "Female Dorm" },
+      3: { name: "Private Room" }
+    };
 
-const nights = (new Date(checkout) - new Date(checkin)) / (1000 * 60 * 60 * 24);
-document.getElementById("summaryNights").innerText = nights;
-document.getElementById("summaryTotal").innerText = (ROOM_CONFIG[roomId]?.price * nights) + " BYN";
+    // ===============================
+    // SET ROOM + BED INFO
+    // ===============================
+    document.getElementById("roomName").innerText = roomData[roomId].name;
+    document.getElementById("bedCode").innerText = "Bed #" + bedId;
+    document.getElementById("summaryBed").innerText = "Selected Bed: Bed #" + bedId;
 
-// Submit booking
-async function submitBooking() {
-  const guestName   = document.getElementById("guestName").value.trim();
-  const guestEmail  = document.getElementById("guestEmail").value.trim();
-  const guestPhone  = document.getElementById("guestPhone").value.trim();
-  const guestCountry= document.getElementById("guestCountry").value.trim();
-  const guestNotes  = document.getElementById("guestNotes").value.trim();
+    // ===============================
+    // PERFECT CALENDAR LOGIC
+    // ===============================
+    const checkinInput = document.getElementById("checkin");
+    const checkoutInput = document.getElementById("checkout");
 
-  if (!roomId || !checkin || !checkout) {
-    alert("Room and dates are missing. Please go back and select again.");
-    return;
-  }
+    function setCalendarDefaults() {
+      const today = new Date();
+      const todayStr = today.toISOString().split("T")[0];
 
-  if (!guestName || !guestEmail || !guestPhone || !guestCountry) {
-    alert("Please fill in all required fields.");
-    return;
-  }
+      const tomorrow = new Date(today);
+      tomorrow.setDate(today.getDate() + 1);
+      const tomorrowStr = tomorrow.toISOString().split("T")[0];
 
-  const guest = {
-    full_name: guestName,
-    email: guestEmail,
-    phone: guestPhone,
-    country: guestCountry,
-    notes: guestNotes
-  };
+      checkinInput.min = todayStr;
+      checkoutInput.min = tomorrowStr;
 
-  const res = await fetch(`${API_BASE}/api/book`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      room_id: roomId,
-      room_name: ROOM_CONFIG[roomId]?.title,
-      price_per_night: ROOM_CONFIG[roomId]?.price,
-      guest,
-      checkin_date: checkin,
-      checkout_date: checkout
-    })
-  });
+      // If coming from room.html, use those dates
+      checkinInput.value = checkinParam || todayStr;
+      checkoutInput.value = checkoutParam || tomorrowStr;
+    }
 
-  const data = await res.json();
+    setCalendarDefaults();
 
-  if (data.status === "success") {
-    window.location.href = `booking-confirmation.html?id=${data.booking_id}`;
-  } else {
-    alert("Booking failed.");
-  }
-}
+    checkinInput.addEventListener("change", () => {
+      const checkinDate = new Date(checkinInput.value);
 
-document.getElementById("bookNowBtn").addEventListener("click", submitBooking);
-</script>
+      const nextDay = new Date(checkinDate);
+      nextDay.setDate(checkinDate.getDate() + 1);
+
+      const nextDayStr = nextDay.toISOString().split("T")[0];
+
+      checkoutInput.min = nextDayStr;
+
+      if (checkoutInput.value < nextDayStr) {
+        checkoutInput.value = nextDayStr;
+      }
+
+      updateSummary();
+    });
+
+    checkoutInput.addEventListener("change", updateSummary);
+
+    // ===============================
+    // UPDATE SUMMARY
+    // ===============================
+    function updateSummary() {
+      const checkin = checkinInput.value;
+      const checkout = checkoutInput.value;
+
+      const name = document.getElementById("guestName").value;
+      const email = document.getElementById("guestEmail").value;
+      const phone = document.getElementById("guestPhone").value;
+      const country = document.getElementById("guestCountry").value;
+
+      document.getElementById("summaryDates").innerText =
+        `Check-in: ${checkin} | Check-out: ${checkout}`;
+
+      document.getElementById("summaryGuest").innerText =
+        `Guest: ${name}, ${email}, ${phone}, ${country}`;
+    }
+
+    document.querySelectorAll(".booking-wrapper input").forEach(input => {
+      input.addEventListener("input", updateSummary);
+    });
+
+    updateSummary();
+  </script>
 
 </body>
 </html>
