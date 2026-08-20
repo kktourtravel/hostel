@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — Hostel Name</title>
+  <link rel="stylesheet" href="style.css?v=999">
+  <style>
+    .admin-section { margin: 30px auto; max-width: 900px; }
+    .admin-section h2 { margin-bottom: 12px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    th, td { padding: 10px; border-bottom: 1px solid #ccc; }
+    th { background: #f5f5f5; }
+    button { padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; }
+    .delete-btn { background: #b33; color: white; }
+    .block-btn { background: var(--primary-teal); color: var(--light-ivory); }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">Hostel Name</div>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="rooms.html">Rooms</a>
+    <a href="booking.html">Booking</a>
+    <a href="admin.html">Admin</a>
+    <a href="contact.html">Contact Us</a>
+  </nav>
+</header>
+
+<section class="admin-section">
+  <h2>Bookings</h2>
+  <table id="bookingsTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Room</th>
+        <th>Guest</th>
+        <th>Check-in</th>
+        <th>Check-out</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</section>
+
+<section class="admin-section">
+  <h2>Blocked Dates</h2>
+
+  <div style="margin-bottom:12px;">
+    <label>Room:</label>
+    <select id="blockRoom">
+      <option value="8bed">8-Bed Dorm</option>
+      <option value="10bed">10-Bed Dorm</option>
+      <option value="single">Single Room</option>
+      <option value="private">Private Room</option>
+    </select>
+
+    <label style="margin-left:12px;">Date:</label>
+    <input type="date" id="blockDate">
+
+    <button class="block-btn" id="blockDateBtn">Block Date</button>
+  </div>
+
+  <table id="blockedTable">
+    <thead>
+      <tr>
+        <th>Room</th>
+        <th>Date</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</section>
+
+<script>
+const API_BASE = "https://hostel-qhe0.onrender.com";
+
+// ⭐ Load all bookings
+async function loadBookings() {
+  const res = await fetch(`${API_BASE}/api/admin/bookings`);
+  const data = await res.json();
+
+  const tbody = document.querySelector("#bookingsTable tbody");
+  tbody.innerHTML = "";
+
+  data.bookings.forEach(b => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${b.id}</td>
+      <td>${b.room_name}</td>
+      <td>${b.guest_name}</td>
+      <td>${b.checkin_date}</td>
+      <td>${b.checkout_date}</td>
+      <td>
+        <button class="delete-btn" onclick="deleteBooking(${b.id})">Delete</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// ⭐ Delete booking
+async function deleteBooking(id) {
+  if (!confirm("Delete this booking?")) return;
+
+  const res = await fetch(`${API_BASE}/api/admin/delete-booking/${id}`, {
+    method: "DELETE"
+  });
+
+  const data = await res.json();
+  if (data.status === "success") {
+    loadBookings();
+  } else {
+    alert("Failed to delete booking.");
+  }
+}
+
+// ⭐ Load blocked dates
+async function loadBlockedDates() {
+  const res = await fetch(`${API_BASE}/api/admin/blocked-dates`);
+  const data = await res.json();
+
+  const tbody = document.querySelector("#blockedTable tbody");
+  tbody.innerHTML = "";
+
+  data.blocked.forEach(d => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${d.room}</td>
+      <td>${d.date}</td>
+      <td>${d.status}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// ⭐ Block a date
+document.getElementById("blockDateBtn").addEventListener("click", async () => {
+  const room = document.getElementById("blockRoom").value;
+  const date = document.getElementById("blockDate").value;
+
+  if (!date) {
+    alert("Select a date.");
+    return;
+  }
+
+  const res = await fetch(`${API_BASE}/api/admin/block-date`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ room, date })
+  });
+
+  const data = await res.json();
+
+  if (data.status === "success") {
+    loadBlockedDates();
+  } else {
+    alert("Failed to block date.");
+  }
+});
+
+// ⭐ Init
+loadBookings();
+loadBlockedDates();
+</script>
+
+</body>
+</html>
