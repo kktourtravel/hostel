@@ -171,9 +171,8 @@ function applyRoomDetails() {
 
 async function loadCalendar() {
   try {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const today = getLocalToday();
+    const [year, month] = today.split("-");
     const monthStr = `${year}-${month}`;
     
     const res = await fetch(`${API_BASE}/api/room/calendar?room=${roomId}&month=${monthStr}`);
@@ -207,13 +206,19 @@ function toYMD(d) {
 }
 
 function getLocalToday() {
+  // Get today's date in local timezone without timezone conversion issues
   const today = new Date();
-  return toYMD(today);
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const date = String(today.getDate()).padStart(2, "0");
+  return `${year}-${month}-${date}`;
 }
 
-function getTomorrow(dateStr) {
-  const date = new Date(dateStr + "T00:00:00");
-  date.setDate(date.getDate() + 1);
+function addDays(dateStr, daysToAdd) {
+  // Parse the YYYY-MM-DD string and add days in local timezone
+  const parts = dateStr.split("-");
+  const date = new Date(parts[0], parseInt(parts[1]) - 1, parseInt(parts[2]));
+  date.setDate(date.getDate() + daysToAdd);
   return toYMD(date);
 }
 
@@ -222,7 +227,7 @@ function setupDateInputs() {
   const checkoutInput = document.getElementById("checkout");
 
   const todayStr = getLocalToday();
-  const tomorrowStr = getTomorrow(todayStr);
+  const tomorrowStr = addDays(todayStr, 1);
 
   // Set min dates and default values
   checkinInput.min = todayStr;
@@ -241,7 +246,7 @@ function setupDateInputs() {
       return;
     }
 
-    const nextDayStr = getTomorrow(val);
+    const nextDayStr = addDays(val, 1);
     checkoutInput.min = nextDayStr;
     
     // Reset checkout if it's before the new minimum
@@ -256,7 +261,7 @@ function setupDateInputs() {
 
     if (!isDateAvailable(val)) {
       alert("Selected check‑out date is not available.");
-      this.value = getTomorrow(checkinInput.value);
+      this.value = addDays(checkinInput.value, 1);
       return;
     }
   });
