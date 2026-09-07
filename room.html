@@ -60,7 +60,7 @@
         <p id="roomDesc" style="color:#4A6358;"></p>
 
         <div style="margin-top:12px;">
-          <span class="price-pill" id="roomPrice">— BYN</span>
+          <span class="price-pill" id="roomPrice">Loading price...</span>
         </div>
 
         <div class="calendar-row">
@@ -114,42 +114,61 @@
 </footer>
 
 <script>
-const API_BASE = "https://hostel-qhe0.onrender.com";  // FIXED
+const API_BASE = "https://hostel-qhe0.onrender.com";
 const roomId = new URLSearchParams(window.location.search).get("room");
 
-// Map rooms.html → room.html details
+// ✅ FIX #1: Room config WITHOUT prices - prices loaded from backend
 const ROOM_CONFIG = {
   "8bed": {
     title: "8-Bed Mixed Dorm",
     desc: "Comfortable bunk beds, lockers, shared bathroom.",
-    price: "45 BYN",
     image: "NAV03661.jpg",
     amenities: ["Wi-Fi", "Lockers", "Shared bathroom", "Linen"]
   },
   "10bed": {
     title: "10-Bed Mixed Dorm",
     desc: "Mixed dorm with cozy atmosphere.",
-    price: "35 BYN",
     image: "10-dorms-room-athens-hawks.jpg",
     amenities: ["Wi-Fi", "Lockers", "Shared bathroom"]
   },
   "single": {
     title: "Single Bed Room",
     desc: "Perfect for solo travelers.",
-    price: "55 BYN",
     image: "caption.jpg",
     amenities: ["Wi-Fi", "Private bathroom", "Linen"]
   },
   "private": {
     title: "Private Room",
     desc: "Perfect for couples or solo travelers.",
-    price: "120 BYN",
     image: "The-Eden-Tampines-Pasir-Ris-Tampines-Singapore.jpg",
     amenities: ["Wi-Fi", "Private bathroom", "Linen"]
   }
 };
 
 let calendarDays = {}; 
+let roomPrice = null; // ✅ Store price fetched from backend
+
+// ✅ FIX #1: Fetch room price from backend API
+async function fetchRoomPrice() {
+  try {
+    const res = await fetch(`${API_BASE}/api/room-price/${roomId}`);
+    
+    if (!res.ok) {
+      console.error("Failed to fetch room price");
+      document.getElementById("roomPrice").innerText = "Price unavailable";
+      return null;
+    }
+    
+    const data = await res.json();
+    roomPrice = data.price; // Store backend price
+    document.getElementById("roomPrice").innerText = `${data.price} BYN`;
+    return data.price;
+  } catch (error) {
+    console.error("Error fetching room price:", error);
+    document.getElementById("roomPrice").innerText = "Price unavailable";
+    return null;
+  }
+}
 
 function applyRoomDetails() {
   const cfg = ROOM_CONFIG[roomId];
@@ -157,7 +176,6 @@ function applyRoomDetails() {
 
   document.getElementById("roomTitle").innerText = cfg.title;
   document.getElementById("roomDesc").innerText = cfg.desc;
-  document.getElementById("roomPrice").innerText = cfg.price;
   document.getElementById("roomImage").src = cfg.image;
 
   const amenitiesList = document.getElementById("amenitiesList");
@@ -320,6 +338,7 @@ function setupActions() {
 
 (async function initRoomPage() {
   applyRoomDetails();
+  await fetchRoomPrice(); // ✅ FIX #1: Load price from backend
   await loadCalendar();
   setupDateInputs();
   setupActions();
